@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amaar Mining – Meeting Minutes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root {
+  --gold:       #B8860B;
+  --gold-light: #D4A520;
+  --gold-pale:  #F5E6B8;
+  --gold-dim:   #7A5A08;
+  --ink:        #1C1C1E;
+  --ink2:       #2C2C2E;
+  --ink3:       #3A3A3C;
+  --slate:      #48484A;
+  --mid:        #8E8E93;
+  --line:       #D1D1D6;
+  --bg:         #F2EFE8;
+  --bg2:        #FAFAF7;
+  --bg3:        #FFFFFF;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Source Sans 3', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+/* PAGE LAYOUT */
+.page-wrap { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar { background: var(--ink); padding: 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar-brand { padding: 28px 24px 22px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 14px; }
+.brand-logo-upload { width: 52px; height: 52px; border: 1px dashed rgba(184,134,11,.5); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; transition: border-color .2s; overflow: hidden; }
+.brand-logo-upload:hover { border-color: var(--gold-light); }
+.brand-logo-upload input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+.brand-logo-upload img { width:100%;height:100%;object-fit:contain; }
+.brand-logo-placeholder { font-size: 22px; color: var(--gold); line-height:1; pointer-events: none; }
+.brand-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: .5px; }
+.brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
+
+.sidebar-section { padding: 20px 24px 16px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.sidebar-section-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--mid); margin-bottom: 12px; }
+.field-group { margin-bottom: 14px; }
+.field-group:last-child { margin-bottom: 0; }
+.field-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--mid); display: block; margin-bottom: 5px; }
+.field-input { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: #FFFFFF; font-family: 'Source Sans 3', sans-serif; font-size: 13px; padding: 8px 11px; outline: none; transition: border-color .2s, background .2s; }
+.field-input:focus { border-color: var(--gold); background: rgba(184,134,11,.08); }
+.field-input::placeholder { color: rgba(255,255,255,.25); font-size:12px; }
+.field-input option { background: var(--ink2); color: #fff; }
+
+/* Attendees */
+.attendees-list { display: flex; flex-direction: column; gap: 6px; }
+.attendee-row { display: flex; gap: 6px; align-items: center; }
+.attendee-row .field-input { flex: 1; font-size:12px; padding: 7px 10px; }
+.btn-icon { width: 28px; height: 28px; flex-shrink: 0; background: transparent; border: 1px solid rgba(255,255,255,.15); color: var(--mid); cursor: pointer; font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+.btn-icon:hover { border-color: var(--gold); color: var(--gold); }
+.btn-icon.danger:hover { border-color: #E05555; color: #E05555; }
+.btn-add-row { background: transparent; border: 1px dashed rgba(184,134,11,.35); color: var(--gold-dim); font-family: 'Source Sans 3', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 7px; width: 100%; cursor: pointer; transition: all .2s; margin-top: 4px; }
+.btn-add-row:hover { border-color: var(--gold); color: var(--gold); background: rgba(184,134,11,.06); }
+
+/* Generate button */
+.sidebar-actions { padding: 20px 24px; margin-top: auto; }
+.btn-generate { width: 100%; background: var(--gold); color: var(--ink); border: none; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; padding: 14px; cursor: pointer; letter-spacing: .5px; transition: background .2s, transform .1s; }
+.btn-generate:hover { background: var(--gold-light); }
+.btn-generate:active { transform: scale(.98); }
+.btn-clear { width: 100%; margin-top: 8px; background: transparent; border: 1px solid rgba(255,255,255,.1); color: var(--mid); font-family: 'Source Sans 3', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 9px; cursor: pointer; transition: all .2s; }
+.btn-clear:hover { border-color: rgba(255,255,255,.2); color: #fff; }
+
+/* MAIN EDITOR */
+.main-editor { background: var(--bg2); display: flex; flex-direction: column; }
+.editor-topbar { background: var(--bg3); border-bottom: 1px solid var(--line); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; position: sticky; top: 0; z-index: 10; }
+.topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--ink); }
+.topbar-title span { color: var(--gold); }
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+.btn-pdf { background: var(--ink); color: #fff; border: none; font-family: 'Source Sans 3', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 22px; cursor: pointer; transition: background .2s; display: flex; align-items: center; gap: 8px; }
+.btn-pdf:hover { background: var(--ink3); }
+.btn-pdf-gold { background: var(--gold); color: var(--ink); border: none; font-family: 'Source Sans 3', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 10px 22px; cursor: pointer; transition: background .2s; display: flex; align-items: center; gap: 8px; }
+.btn-pdf-gold:hover { background: var(--gold-light); }
+.editor-body { padding: 40px 32px; flex: 1; }
+
+/* Items section */
+.items-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.items-header h2 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--ink); }
+.btn-add-item { background: var(--gold); color: var(--ink); border: none; font-family: 'Source Sans 3', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 10px 18px; cursor: pointer; transition: background .2s; }
+.btn-add-item:hover { background: var(--gold-light); }
+
+/* Agenda item cards */
+.agenda-items { display: flex; flex-direction: column; gap: 14px; }
+.agenda-card { background: var(--bg3); border: 1px solid var(--line); border-left: 4px solid var(--gold); transition: box-shadow .2s; animation: slideIn .25s ease forwards; }
+@keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+.agenda-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+.card-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); cursor: grab; }
+.card-header:active { cursor: grabbing; }
+.item-num { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; color: var(--gold); min-width: 24px; flex-shrink: 0; }
+.card-title-input { flex: 1; border: none; background: transparent; font-family: 'Source Sans 3', sans-serif; font-size: 15px; font-weight: 600; color: var(--ink); outline: none; border-bottom: 1px solid transparent; transition: border-color .2s; padding: 1px 0; }
+.card-title-input:focus { border-bottom-color: var(--gold); }
+.card-title-input::placeholder { color: var(--mid); font-weight: 400; }
+.status-select { background: transparent; border: 1px solid var(--line); font-family: 'Source Sans 3', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--slate); padding: 4px 8px; outline: none; cursor: pointer; transition: border-color .2s; flex-shrink: 0; }
+.status-select:focus { border-color: var(--gold); }
+.card-remove { background: none; border: none; cursor: pointer; color: var(--mid); font-size: 20px; line-height: 1; padding: 2px 4px; transition: color .2s; flex-shrink: 0; }
+.card-remove:hover { color: #C04040; }
+.card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field-label-editor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mid); display: block; margin-bottom: 5px; }
+.input-editor { width: 100%; background: var(--bg); border: 1px solid var(--line); font-family: 'Source Sans 3', sans-serif; font-size: 13px; color: var(--ink); padding: 8px 11px; outline: none; transition: border-color .2s; }
+.input-editor:focus { border-color: var(--gold); }
+.input-editor::placeholder { color: var(--mid); }
+textarea.input-editor { resize: vertical; line-height: 1.6; }
+
+/* Action items */
+.action-items-mini { margin-top: 4px; }
+.action-items-mini-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mid); margin-bottom: 6px; }
+.action-row { display: grid; grid-template-columns: 1fr 140px 120px 28px; gap: 6px; align-items: center; margin-bottom: 5px; }
+.action-row .input-editor { font-size: 12px; padding: 6px 9px; }
+.btn-add-action { background: transparent; border: 1px dashed rgba(184,134,11,.3); color: var(--gold-dim); font-family: 'Source Sans 3', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px; width: 100%; cursor: pointer; transition: all .2s; margin-top: 2px; }
+.btn-add-action:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--mid); }
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+.empty-state p { font-size: 14px; line-height: 1.7; }
+.empty-state strong { color: var(--gold); }
+
+/* PDF DOCUMENT (hidden, used for generation) */
+#pdf-content { display: none; font-family: 'Source Sans 3', sans-serif; background: #fff; color: #1C1C1E; width: 210mm; padding: 18mm 20mm; line-height: 1.6; }
+.pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 14px; margin-bottom: 20px; border-bottom: 3px solid #B8860B; }
+.pdf-logo-img { max-height: 55px; max-width: 160px; object-fit: contain; display: block; margin-bottom: 6px; }
+.pdf-company-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #1C1C1E; letter-spacing: .5px; }
+.pdf-company-sub { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #B8860B; margin-top: 2px; }
+.pdf-doc-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #B8860B; text-transform: uppercase; letter-spacing: 1px; text-align: right; }
+.pdf-doc-date { font-size: 11px; color: #8E8E93; margin-top: 4px; letter-spacing: 1px; text-align: right; }
+.pdf-doc-ref { font-size: 10px; color: #B8860B; margin-top: 2px; letter-spacing: 1px; text-align: right; }
+.pdf-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid #E0E0E0; margin-bottom: 20px; }
+.pdf-meta-cell { padding: 9px 14px; border-right: 1px solid #E0E0E0; }
+.pdf-meta-cell:nth-child(3n) { border-right: none; }
+.pdf-meta-cell:nth-child(n+4) { border-top: 1px solid #E0E0E0; }
+.pdf-meta-label { font-size: 8px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #8E8E93; margin-bottom: 3px; }
+.pdf-meta-value { font-size: 12px; font-weight: 600; color: #1C1C1E; }
+.pdf-section-heading { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #B8860B; border-bottom: 1px solid #B8860B; padding-bottom: 5px; margin-bottom: 10px; margin-top: 18px; }
+.pdf-attendees-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 16px; margin-bottom: 4px; }
+.pdf-attendee-item { font-size: 11px; color: #3A3A3C; padding: 3px 0; border-bottom: 1px dotted #E8E8E8; display: flex; align-items: center; gap: 6px; }
+.pdf-attendee-item::before { content: ''; width: 5px; height: 5px; background: #B8860B; flex-shrink: 0; display: inline-block; }
+.pdf-agenda-item { margin-bottom: 16px; border: 1px solid #E8E8E8; border-left: 4px solid #B8860B; page-break-inside: avoid; }
+.pdf-item-header { display: flex; align-items: center; gap: 10px; background: #FAFAF7; padding: 8px 14px; border-bottom: 1px solid #E8E8E8; }
+.pdf-item-num { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; color: #B8860B; min-width: 22px; }
+.pdf-item-title { font-size: 13px; font-weight: 700; color: #1C1C1E; flex: 1; }
+.pdf-item-status { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 3px 8px; border: 1px solid; }
+.status-discussed { color: #2A6A2A; border-color: #2A6A2A; background: #F0FFF0; }
+.status-pending   { color: #8B6914; border-color: #8B6914; background: #FFFAF0; }
+.status-deferred  { color: #6A2A2A; border-color: #6A2A2A; background: #FFF0F0; }
+.status-approved  { color: #1A4A7A; border-color: #1A4A7A; background: #F0F4FF; }
+.status-info      { color: #8E8E93; border-color: #8E8E93; background: #F5F5F7; }
+.pdf-item-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+.pdf-item-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pdf-field-label { font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #8E8E93; margin-bottom: 2px; }
+.pdf-field-value { font-size: 11px; color: #3A3A3C; line-height: 1.5; }
+.pdf-action-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 4px; }
+.pdf-action-table th { background: #1C1C1E; color: #fff; font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 8px; text-align: left; }
+.pdf-action-table td { padding: 5px 8px; border-bottom: 1px solid #F0F0F0; color: #3A3A3C; vertical-align: top; }
+.pdf-action-table tr:last-child td { border-bottom: none; }
+.pdf-action-table tr:nth-child(even) td { background: #FAFAF7; }
+.pdf-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 10px; border-top: 1px solid #E8E8E8; font-size: 9px; color: #8E8E93; letter-spacing: 1px; }
+.pdf-footer-brand { color: #B8860B; font-weight: 700; letter-spacing: 2px; }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .page-wrap { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .editor-body { padding: 24px 16px; }
+  .card-row { grid-template-columns: 1fr; }
+  .action-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* TOAST */
+#toast { position: fixed; bottom: 24px; right: 24px; background: var(--ink); color: #fff; font-family: 'Source Sans 3', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; padding: 12px 20px; border-left: 3px solid var(--gold); transform: translateX(120px); opacity: 0; transition: all .3s ease; z-index: 9999; pointer-events: none; }
+#toast.show { transform: translateX(0); opacity: 1; }
+
+/* Loading */
+#loading { display: none; position: fixed; inset: 0; background: rgba(28,28,30,.75); z-index: 9998; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+#loading.show { display: flex; }
+.spinner { width: 36px; height: 36px; border: 3px solid rgba(184,134,11,.2); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading p { color: #fff; font-family: 'Source Sans 3', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo-upload" id="logo-upload-trigger">
+        <input type="file" id="logo-file" accept="image/*">
+        <div id="logo-display">
+          <div class="brand-logo-placeholder">⬡</div>
+        </div>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">Amaar Mining</div>
+        <div class="brand-sub">Minutes System</div>
+      </div>
+    </div>
+
+    <!-- Meeting Details -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Meeting Details</div>
+      <div class="field-group">
+        <label class="field-label">Meeting Title</label>
+        <input class="field-input" type="text" id="mtg-title" placeholder="e.g. Weekly Site Review">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Meeting Type</label>
+        <select class="field-input" id="mtg-type">
+          <option value="">Select type…</option>
+          <option>Board Meeting</option>
+          <option>Site Review</option>
+          <option>Safety Briefing</option>
+          <option>Exploration Review</option>
+          <option>Project Update</option>
+          <option>Management Meeting</option>
+          <option>Technical Meeting</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input class="field-input" type="date" id="mtg-date">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Time</label>
+        <input class="field-input" type="time" id="mtg-time">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Location / Platform</label>
+        <input class="field-input" type="text" id="mtg-location" placeholder="e.g. Board Room A / Zoom">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Ref. No.</label>
+        <input class="field-input" type="text" id="mtg-ref" placeholder="e.g. MIN-2024-042">
+      </div>
+    </div>
+
+    <!-- Roles -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Roles</div>
+      <div class="field-group">
+        <label class="field-label">Chairperson</label>
+        <input class="field-input" type="text" id="mtg-chair" placeholder="Name & Title">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Minutes Recorded By</label>
+        <input class="field-input" type="text" id="mtg-recorder" placeholder="Name & Title">
+      </div>
+    </div>
+
+    <!-- Attendees -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Attendees</div>
+      <div class="attendees-list" id="attendees-list"></div>
+      <button class="btn-add-row" id="btn-add-attendee">+ Add Attendee</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="sidebar-actions">
+      <button class="btn-generate" id="btn-generate">⬇ Generate PDF</button>
+      <button class="btn-clear" id="btn-clear">Clear Everything</button>
+    </div>
+  </aside>
+
+  <!-- MAIN EDITOR -->
+  <main class="main-editor">
+    <div class="editor-topbar">
+      <div class="topbar-title">Meeting <span>Minutes</span></div>
+      <div class="topbar-actions">
+        <button class="btn-pdf" id="btn-print">🖨 Print</button>
+        <button class="btn-pdf-gold" id="btn-pdf-top">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="editor-body">
+      <div class="items-header">
+        <h2>Agenda Items</h2>
+        <button class="btn-add-item" id="btn-add-item">+ Add Item</button>
+      </div>
+      <div class="agenda-items" id="agenda-items">
+        <div class="empty-state" id="empty-state">
+          <div class="icon">📋</div>
+          <p>No agenda items yet.<br>Click <strong>+ Add Item</strong> to begin recording the meeting.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Hidden PDF output -->
+<div id="pdf-content"></div>
+<div id="toast"></div>
+<div id="loading"><div class="spinner"></div><p>Generating PDF…</p></div>
+
+<script>
+// STATE
+let logoDataUrl = null;
+let attendees = [];
+let agendaItems = [];
+let attendeeIdCtr = 0;
+let itemIdCtr = 0;
+let dragSrcId = null;
+
+// INIT
+document.getElementById('mtg-date').valueAsDate = new Date();
+document.getElementById('mtg-time').value = new Date().toTimeString().slice(0,5);
+addAttendee(); addAttendee(); addAttendee();
+renderAttendees();
+
+// LOGO UPLOAD
+document.getElementById('logo-file').addEventListener('change', function(){
+  if (!this.files || !this.files[0]) return;
+  const fr = new FileReader();
+  fr.onload = function(e) {
+    logoDataUrl = e.target.result;
+    const display = document.getElementById('logo-display');
+    display.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = logoDataUrl;
+    img.style.cssText = 'width:48px;height:48px;object-fit:contain;';
+    display.appendChild(img);
+  };
+  fr.readAsDataURL(this.files[0]);
+});
+
+// ATTENDEES
+document.getElementById('btn-add-attendee').addEventListener('click', function(){ addAttendee(); renderAttendees(); });
+
+function addAttendee() {
+  const id = ++attendeeIdCtr;
+  attendees.push({ id: id, name: '', role: '' });
+}
+
+function renderAttendees() {
+  const list = document.getElementById('attendees-list');
+  list.innerHTML = '';
+  attendees.forEach(function(a) {
+    const row = document.createElement('div');
+    row.className = 'attendee-row';
+
+    const nameInput = document.createElement('input');
+    nameInput.className = 'field-input';
+    nameInput.type = 'text';
+    nameInput.placeholder = 'Name';
+    nameInput.value = a.name;
+    nameInput.style.cssText = 'font-size:12px;padding:7px 10px;flex:1;';
+    nameInput.addEventListener('input', function(){ a.name = this.value; });
+
+    const roleInput = document.createElement('input');
+    roleInput.className = 'field-input';
+    roleInput.type = 'text';
+    roleInput.placeholder = 'Role';
+    roleInput.value = a.role;
+    roleInput.style.cssText = 'font-size:11px;padding:7px 8px;width:80px;flex-shrink:0;';
+    roleInput.addEventListener('input', function(){ a.role = this.value; });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn-icon danger';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.title = 'Remove';
+    removeBtn.addEventListener('click', function(){
+      attendees = attendees.filter(function(x){ return x.id !== a.id; });
+      renderAttendees();
+    });
+
+    row.appendChild(nameInput);
+    row.appendChild(roleInput);
+    row.appendChild(removeBtn);
+    list.appendChild(row);
+  });
+}
+
+// AGENDA ITEMS
+document.getElementById('btn-add-item').addEventListener('click', function(){ addAgendaItem(); });
+
+function addAgendaItem() {
+  const id = ++itemIdCtr;
+  agendaItems.push({ id: id, title:'', presenter:'', timeAlloc:'', discussion:'', decision:'', status:'Discussed', actionItems:[] });
+  renderAgendaItems();
+}
+
+function renderAgendaItems() {
+  const container = document.getElementById('agenda-items');
+  container.innerHTML = '';
+
+  if (agendaItems.length === 0) {
+    container.innerHTML = '<div class="empty-state" id="empty-state"><div class="icon">📋</div><p>No agenda items yet.<br>Click <strong>+ Add Item</strong> to begin recording the meeting.</p></div>';
+    return;
+  }
+
+  agendaItems.forEach(function(item, idx) {
+    const card = document.createElement('div');
+    card.className = 'agenda-card';
+    card.dataset.id = item.id;
+
+    // Card header
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    header.draggable = true;
+
+    const numSpan = document.createElement('span');
+    numSpan.className = 'item-num';
+    numSpan.textContent = String(idx + 1).padStart(2, '0');
+
+    const titleInput = document.createElement('input');
+    titleInput.className = 'card-title-input';
+    titleInput.type = 'text';
+    titleInput.placeholder = 'Agenda item title…';
+    titleInput.value = item.title;
+    titleInput.addEventListener('input', function(){ item.title = this.value; });
+
+    const statusSelect = document.createElement('select');
+    statusSelect.className = 'status-select';
+    ['Discussed','Pending','Deferred','Approved','For Information'].forEach(function(s){
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      if (item.status === s) opt.selected = true;
+      statusSelect.appendChild(opt);
+    });
+    statusSelect.addEventListener('change', function(){ item.status = this.value; });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'card-remove';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.title = 'Remove item';
+    removeBtn.addEventListener('click', function(){
+      agendaItems = agendaItems.filter(function(x){ return x.id !== item.id; });
+      renderAgendaItems();
+    });
+
+    header.appendChild(numSpan);
+    header.appendChild(titleInput);
+    header.appendChild(statusSelect);
+    header.appendChild(removeBtn);
+
+    // Drag events
+    header.addEventListener('dragstart', function(){
+      dragSrcId = item.id;
+      card.style.opacity = '0.4';
+    });
+    header.addEventListener('dragend', function(){
+      card.style.opacity = '1';
+    });
+    card.addEventListener('dragover', function(e){
+      e.preventDefault();
+      card.style.outline = '2px solid var(--gold)';
+    });
+    card.addEventListener('dragleave', function(){
+      card.style.outline = '';
+    });
+    card.addEventListener('drop', function(e){
+      e.preventDefault();
+      card.style.outline = '';
+      if (dragSrcId === item.id) return;
+      const fi = agendaItems.findIndex(function(x){ return x.id === dragSrcId; });
+      const ti = agendaItems.findIndex(function(x){ return x.id === item.id; });
+      if (fi === -1 || ti === -1) return;
+      const moved = agendaItems.splice(fi, 1)[0];
+      agendaItems.splice(ti, 0, moved);
+      renderAgendaItems();
+    });
+
+    // Card body
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    // Row: Presenter + Time
+    const row1 = document.createElement('div');
+    row1.className = 'card-row';
+
+    const presGroup = document.createElement('div');
+    const presLabel = document.createElement('label');
+    presLabel.className = 'field-label-editor';
+    presLabel.textContent = 'Presenter / Owner';
+    const presInput = document.createElement('input');
+    presInput.className = 'input-editor';
+    presInput.type = 'text';
+    presInput.placeholder = 'Name & role';
+    presInput.value = item.presenter;
+    presInput.addEventListener('input', function(){ item.presenter = this.value; });
+    presGroup.appendChild(presLabel);
+    presGroup.appendChild(presInput);
+
+    const timeGroup = document.createElement('div');
+    const timeLabel = document.createElement('label');
+    timeLabel.className = 'field-label-editor';
+    timeLabel.textContent = 'Time Allocated';
+    const timeInput = document.createElement('input');
+    timeInput.className = 'input-editor';
+    timeInput.type = 'text';
+    timeInput.placeholder = 'e.g. 15 min';
+    timeInput.value = item.timeAlloc || '';
+    timeInput.addEventListener('input', function(){ item.timeAlloc = this.value; });
+    timeGroup.appendChild(timeLabel);
+    timeGroup.appendChild(timeInput);
+
+    row1.appendChild(presGroup);
+    row1.appendChild(timeGroup);
+
+    // Discussion
+    const discGroup = document.createElement('div');
+    const discLabel = document.createElement('label');
+    discLabel.className = 'field-label-editor';
+    discLabel.textContent = 'Discussion / Notes';
+    const discArea = document.createElement('textarea');
+    discArea.className = 'input-editor';
+    discArea.rows = 3;
+    discArea.placeholder = 'Key points discussed…';
+    discArea.value = item.discussion;
+    discArea.addEventListener('input', function(){ item.discussion = this.value; });
+    discGroup.appendChild(discLabel);
+    discGroup.appendChild(discArea);
+
+    // Decision
+    const decGroup = document.createElement('div');
+    const decLabel = document.createElement('label');
+    decLabel.className = 'field-label-editor';
+    decLabel.textContent = 'Decision / Outcome';
+    const decArea = document.createElement('textarea');
+    decArea.className = 'input-editor';
+    decArea.rows = 2;
+    decArea.placeholder = 'Decisions made or conclusions reached…';
+    decArea.value = item.decision;
+    decArea.addEventListener('input', function(){ item.decision = this.value; });
+    decGroup.appendChild(decLabel);
+    decGroup.appendChild(decArea);
+
+    // Action items
+    const actionWrap = document.createElement('div');
+    actionWrap.className = 'action-items-mini';
+    const actionLabel = document.createElement('div');
+    actionLabel.className = 'action-items-mini-label';
+    actionLabel.textContent = 'Action Items';
+    const actionRows = document.createElement('div');
+    actionRows.id = 'actions-' + item.id;
+    const addActionBtn = document.createElement('button');
+    addActionBtn.className = 'btn-add-action';
+    addActionBtn.textContent = '+ Add Action Item';
+    addActionBtn.addEventListener('click', function(){
+      item.actionItems.push({ action:'', responsible:'', deadline:'' });
+      renderActionRows(item);
+    });
+    actionWrap.appendChild(actionLabel);
+    actionWrap.appendChild(actionRows);
+    actionWrap.appendChild(addActionBtn);
+
+    body.appendChild(row1);
+    body.appendChild(discGroup);
+    body.appendChild(decGroup);
+    body.appendChild(actionWrap);
+
+    card.appendChild(header);
+    card.appendChild(body);
+    container.appendChild(card);
+
+    // Render action rows for this item
+    renderActionRows(item);
+  });
+}
+
+function renderActionRows(item) {
+  const wrap = document.getElementById('actions-' + item.id);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  item.actionItems.forEach(function(ai, aIdx) {
+    const row = document.createElement('div');
+    row.className = 'action-row';
+
+    const actionIn = document.createElement('input');
+    actionIn.className = 'input-editor';
+    actionIn.type = 'text';
+    actionIn.placeholder = 'Action description';
+    actionIn.value = ai.action;
+    actionIn.style.cssText = 'font-size:12px;padding:6px 9px;';
+    actionIn.addEventListener('input', function(){ ai.action = this.value; });
+
+    const respIn = document.createElement('input');
+    respIn.className = 'input-editor';
+    respIn.type = 'text';
+    respIn.placeholder = 'Responsible';
+    respIn.value = ai.responsible;
+    respIn.style.cssText = 'font-size:12px;padding:6px 9px;';
+    respIn.addEventListener('input', function(){ ai.responsible = this.value; });
+
+    const deadIn = document.createElement('input');
+    deadIn.className = 'input-editor';
+    deadIn.type = 'date';
+    deadIn.value = ai.deadline;
+    deadIn.style.cssText = 'font-size:12px;padding:6px 9px;';
+    deadIn.addEventListener('change', function(){ ai.deadline = this.value; });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn-icon danger';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.title = 'Remove';
+    removeBtn.addEventListener('click', function(){
+      item.actionItems.splice(aIdx, 1);
+      renderActionRows(item);
+    });
+
+    row.appendChild(actionIn);
+    row.appendChild(respIn);
+    row.appendChild(deadIn);
+    row.appendChild(removeBtn);
+    wrap.appendChild(row);
+  });
+}
+
+// HELPERS
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatDate(dateVal) {
+  if (!dateVal) return { dayName: '', dateStr: '' };
+  const d = new Date(dateVal + 'T12:00:00');
+  return {
+    dayName: d.toLocaleDateString('en-GB', { weekday: 'long' }),
+    dateStr: d.toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' })
+  };
+}
+
+function buildPDFHTML() {
+  const title    = document.getElementById('mtg-title').value.trim() || 'Meeting Minutes';
+  const type     = document.getElementById('mtg-type').value;
+  const dateVal  = document.getElementById('mtg-date').value;
+  const timeVal  = document.getElementById('mtg-time').value;
+  const loc      = document.getElementById('mtg-location').value.trim();
+  const ref      = document.getElementById('mtg-ref').value.trim();
+  const chair    = document.getElementById('mtg-chair').value.trim();
+  const recorder = document.getElementById('mtg-recorder').value.trim();
+
+  const { dayName, dateStr } = formatDate(dateVal);
+
+  const filledAttendees = attendees.filter(function(a){ return a.name.trim(); });
+  const filledItems = agendaItems.filter(function(it){ return it.title.trim() || it.discussion.trim(); });
+
+  const metaCells = [
+    { label:'Meeting Type', value: type || '—' },
+    { label:'Date', value: dayName + ', ' + dateStr },
+    { label:'Time', value: timeVal || '—' },
+    { label:'Location', value: loc || '—' },
+    { label:'Chairperson', value: chair || '—' },
+    { label:'Recorded By', value: recorder || '—' },
+  ];
+  if (ref) metaCells.push({ label:'Reference No.', value: ref });
+
+  const logoHtml = logoDataUrl ? '<img class="pdf-logo-img" src="' + logoDataUrl + '" alt="logo">' : '';
+
+  // Meta grid
+  const metaHtml = metaCells.map(function(c){
+    return '<div class="pdf-meta-cell"><div class="pdf-meta-label">' + esc(c.label) + '</div><div class="pdf-meta-value">' + esc(c.value) + '</div></div>';
+  }).join('');
+
+  // Attendees
+  const attHtml = filledAttendees.length > 0
+    ? '<div class="pdf-section-heading">Attendees (' + filledAttendees.length + ')</div>'
+      + '<div class="pdf-attendees-grid">'
+      + filledAttendees.map(function(a){
+          return '<div class="pdf-attendee-item">' + esc(a.name) + (a.role ? ' <span style="color:#8E8E93;font-size:10px">– ' + esc(a.role) + '</span>' : '') + '</div>';
+        }).join('')
+      + '</div>'
+    : '';
+
+  // Status classes
+  const statusClass = { 'Discussed':'status-discussed','Pending':'status-pending','Deferred':'status-deferred','Approved':'status-approved','For Information':'status-info' };
+
+  // Items
+  const itemsHtml = filledItems.map(function(it, i){
+    const sc = statusClass[it.status] || 'status-info';
+
+    const actHtml = it.actionItems.length
+      ? '<div style="margin-top:6px;">'
+        + '<div class="pdf-field-label" style="margin-bottom:4px;">Action Items</div>'
+        + '<table class="pdf-action-table"><thead><tr><th>Action</th><th style="width:130px">Responsible</th><th style="width:90px">Deadline</th></tr></thead><tbody>'
+        + it.actionItems.map(function(ai){
+            const dl = ai.deadline ? new Date(ai.deadline + 'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+            return '<tr><td>' + esc(ai.action||'—') + '</td><td>' + esc(ai.responsible||'—') + '</td><td>' + dl + '</td></tr>';
+          }).join('')
+        + '</tbody></table></div>'
+      : '';
+
+    return '<div class="pdf-agenda-item">'
+      + '<div class="pdf-item-header">'
+        + '<span class="pdf-item-num">' + String(i+1).padStart(2,'0') + '</span>'
+        + '<span class="pdf-item-title">' + esc(it.title || 'Untitled Item') + '</span>'
+        + '<span class="pdf-item-status ' + sc + '">' + esc(it.status) + '</span>'
+      + '</div>'
+      + '<div class="pdf-item-body">'
+        + ((it.presenter || it.timeAlloc) ? '<div class="pdf-item-row">'
+            + (it.presenter ? '<div><div class="pdf-field-label">Presenter / Owner</div><div class="pdf-field-value">' + esc(it.presenter) + '</div></div>' : '<div></div>')
+            + (it.timeAlloc ? '<div><div class="pdf-field-label">Time Allocated</div><div class="pdf-field-value">' + esc(it.timeAlloc) + '</div></div>' : '<div></div>')
+          + '</div>' : '')
+        + (it.discussion ? '<div><div class="pdf-field-label">Discussion / Notes</div><div class="pdf-field-value" style="white-space:pre-wrap;">' + esc(it.discussion) + '</div></div>' : '')
+        + (it.decision ? '<div><div class="pdf-field-label">Decision / Outcome</div><div class="pdf-field-value" style="font-weight:600;white-space:pre-wrap;color:#1C1C1E;">' + esc(it.decision) + '</div></div>' : '')
+        + actHtml
+      + '</div>'
+    + '</div>';
+  }).join('');
+
+  return '<div class="pdf-header">'
+    + '<div class="pdf-brand-block">' + logoHtml + '<div class="pdf-company-name">Amaar Mining</div><div class="pdf-company-sub">Saudi Arabian Mining</div></div>'
+    + '<div class="pdf-doc-label"><div class="pdf-doc-title">Minutes of Meeting</div><div class="pdf-doc-date">' + esc(dayName) + ', ' + esc(dateStr) + (timeVal ? ' · ' + esc(timeVal) : '') + '</div>' + (ref ? '<div class="pdf-doc-ref">Ref: ' + esc(ref) + '</div>' : '') + '</div>'
+  + '</div>'
+  + (title ? '<div style="font-family:\'Playfair Display\',serif;font-size:18px;font-weight:700;color:#1C1C1E;margin-bottom:14px;letter-spacing:.3px;">' + esc(title) + '</div>' : '')
+  + '<div class="pdf-meta-grid">' + metaHtml + '</div>'
+  + attHtml
+  + '<div class="pdf-section-heading">Agenda Items (' + filledItems.length + ')</div>'
+  + (filledItems.length > 0 ? itemsHtml : '<p style="font-size:12px;color:#8E8E93;font-style:italic;">No agenda items recorded.</p>')
+  + '<div class="pdf-footer"><div class="pdf-footer-brand">AMAAR MINING · CONFIDENTIAL</div><div>' + new Date().toLocaleDateString('en-GB',{year:'numeric',month:'long',day:'numeric'}) + '</div></div>';
+}
+
+// GENERATE PDF
+function generatePDF() {
+  const title  = document.getElementById('mtg-title').value.trim() || 'Meeting_Minutes';
+  const dateVal = document.getElementById('mtg-date').value;
+
+  const el = document.getElementById('pdf-content');
+  el.innerHTML = buildPDFHTML();
+  el.style.display = 'block';
+
+  const loading = document.getElementById('loading');
+  loading.classList.add('show');
+
+  const safeTitle = title.replace(/[^a-z0-9_\-]/gi, '_');
+  const opt = {
+    margin: [8, 8, 8, 8],
+    filename: safeTitle + '_' + (dateVal || 'minutes') + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(el).save().then(function(){
+    el.style.display = 'none';
+    loading.classList.remove('show');
+    showToast('PDF downloaded successfully ✓');
+  }).catch(function(err){
+    console.error('PDF error:', err);
+    el.style.display = 'none';
+    loading.classList.remove('show');
+    showToast('Error generating PDF');
+  });
+}
+
+document.getElementById('btn-generate').addEventListener('click', generatePDF);
+document.getElementById('btn-pdf-top').addEventListener('click', generatePDF);
+
+// PRINT
+document.getElementById('btn-print').addEventListener('click', function(){
+  const html = buildPDFHTML();
+  const printWin = window.open('', '_blank', 'width=900,height=700');
+  if (!printWin) { showToast('Please allow popups for printing'); return; }
+  printWin.document.write('<!DOCTYPE html><html><head><title>Meeting Minutes<\/title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">'
+    + '<style>'
+    + '*{box-sizing:border-box;margin:0;padding:0;}'
+    + 'body{font-family:"Source Sans 3",sans-serif;color:#1C1C1E;background:#fff;padding:20mm 22mm;}'
+    + '.pdf-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;margin-bottom:20px;border-bottom:3px solid #B8860B;}'
+    + '.pdf-company-name{font-family:"Playfair Display",serif;font-size:22px;font-weight:900;color:#1C1C1E;}'
+    + '.pdf-company-sub{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B8860B;margin-top:2px;}'
+    + '.pdf-doc-title{font-family:"Playfair Display",serif;font-size:17px;font-weight:700;color:#B8860B;text-transform:uppercase;letter-spacing:1px;text-align:right;}'
+    + '.pdf-doc-date{font-size:11px;color:#8E8E93;margin-top:4px;text-align:right;}'
+    + '.pdf-doc-ref{font-size:10px;color:#B8860B;margin-top:2px;text-align:right;}'
+    + '.pdf-meta-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #E0E0E0;margin-bottom:20px;}'
+    + '.pdf-meta-cell{padding:9px 14px;border-right:1px solid #E0E0E0;}'
+    + '.pdf-meta-cell:nth-child(3n){border-right:none;}'
+    + '.pdf-meta-cell:nth-child(n+4){border-top:1px solid #E0E0E0;}'
+    + '.pdf-meta-label{font-size:8px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#8E8E93;margin-bottom:3px;}'
+    + '.pdf-meta-value{font-size:12px;font-weight:600;color:#1C1C1E;}'
+    + '.pdf-section-heading{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#B8860B;border-bottom:1px solid #B8860B;padding-bottom:5px;margin-bottom:10px;margin-top:18px;}'
+    + '.pdf-attendees-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 16px;margin-bottom:4px;}'
+    + '.pdf-attendee-item{font-size:11px;color:#3A3A3C;padding:3px 0;border-bottom:1px dotted #E8E8E8;display:flex;align-items:center;gap:6px;}'
+    + '.pdf-attendee-item::before{content:"";width:5px;height:5px;background:#B8860B;flex-shrink:0;display:inline-block;}'
+    + '.pdf-agenda-item{margin-bottom:16px;border:1px solid #E8E8E8;border-left:4px solid #B8860B;page-break-inside:avoid;}'
+    + '.pdf-item-header{display:flex;align-items:center;gap:10px;background:#FAFAF7;padding:8px 14px;border-bottom:1px solid #E8E8E8;}'
+    + '.pdf-item-num{font-family:"Playfair Display",serif;font-size:13px;font-weight:700;color:#B8860B;min-width:22px;}'
+    + '.pdf-item-title{font-size:13px;font-weight:700;color:#1C1C1E;flex:1;}'
+    + '.pdf-item-status{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border:1px solid;}'
+    + '.status-discussed{color:#2A6A2A;border-color:#2A6A2A;background:#F0FFF0;}'
+    + '.status-pending{color:#8B6914;border-color:#8B6914;background:#FFFAF0;}'
+    + '.status-deferred{color:#6A2A2A;border-color:#6A2A2A;background:#FFF0F0;}'
+    + '.status-approved{color:#1A4A7A;border-color:#1A4A7A;background:#F0F4FF;}'
+    + '.status-info{color:#8E8E93;border-color:#8E8E93;background:#F5F5F7;}'
+    + '.pdf-item-body{padding:10px 14px;display:flex;flex-direction:column;gap:8px;}'
+    + '.pdf-item-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}'
+    + '.pdf-field-label{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8E8E93;margin-bottom:2px;}'
+    + '.pdf-field-value{font-size:11px;color:#3A3A3C;line-height:1.5;}'
+    + '.pdf-action-table{width:100%;border-collapse:collapse;font-size:10px;margin-top:4px;}'
+    + '.pdf-action-table th{background:#1C1C1E;color:#fff;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 8px;text-align:left;}'
+    + '.pdf-action-table td{padding:5px 8px;border-bottom:1px solid #F0F0F0;color:#3A3A3C;}'
+    + '.pdf-action-table tr:nth-child(even) td{background:#FAFAF7;}'
+    + '.pdf-footer{display:flex;justify-content:space-between;margin-top:28px;padding-top:10px;border-top:1px solid #E8E8E8;font-size:9px;color:#8E8E93;}'
+    + '.pdf-footer-brand{color:#B8860B;font-weight:700;letter-spacing:2px;}'
+    + '.pdf-logo-img{max-height:55px;max-width:160px;object-fit:contain;display:block;margin-bottom:6px;}'
+    + '.pdf-brand-block{}'
+    + '.pdf-doc-label{text-align:right;}'
+    + '@media print{body{padding:0;}}'
+    + '<\/style><\/head><body>' + html + '<\/body><\/html>');
+  printWin.document.close();
+  setTimeout(function(){ printWin.focus(); printWin.print(); }, 900);
+});
+
+// CLEAR
+document.getElementById('btn-clear').addEventListener('click', function(){
+  if (!confirm('Clear all data? This cannot be undone.')) return;
+  ['mtg-title','mtg-location','mtg-ref','mtg-chair','mtg-recorder'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('mtg-type').value = '';
+  document.getElementById('mtg-date').valueAsDate = new Date();
+  document.getElementById('mtg-time').value = new Date().toTimeString().slice(0,5);
+  attendees = [];
+  agendaItems = [];
+  logoDataUrl = null;
+  attendeeIdCtr = 0;
+  itemIdCtr = 0;
+  document.getElementById('logo-display').innerHTML = '<div class="brand-logo-placeholder">⬡</div>';
+  addAttendee(); addAttendee(); addAttendee();
+  renderAttendees();
+  renderAgendaItems();
+  showToast('Cleared ✓');
+});
+
+// TOAST
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+</script>
+</body>
+</html>
