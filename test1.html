@@ -40,7 +40,6 @@
     padding: 0 20px 80px;
   }
 
-  /* Header */
   .app-header {
     display: flex;
     align-items: center;
@@ -73,7 +72,6 @@
     margin-top: 4px;
   }
 
-  /* Company info block */
   .company-block {
     background: var(--dark2);
     border: 1px solid var(--border);
@@ -145,6 +143,20 @@
   .logo-upload-label { font-size: 12px; color: var(--text-muted); letter-spacing: 1px; }
   .logo-upload-label span { color: var(--gold); font-weight: 600; }
 
+  /* Section type badge */
+  .section-type-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .badge-text { background: rgba(200,148,58,.15); color: var(--gold); border: 1px solid var(--gold-dim); }
+  .badge-table { background: rgba(58,138,90,.15); color: #5EC488; border: 1px solid #2A6040; }
+
   /* Section cards */
   .sections-container { display: flex; flex-direction: column; gap: 16px; }
   .section-card {
@@ -164,11 +176,7 @@
     user-select: none;
   }
   .section-header:active { cursor: grabbing; }
-  .drag-handle {
-    color: var(--text-muted);
-    font-size: 16px;
-    flex-shrink: 0;
-  }
+  .drag-handle { color: var(--text-muted); font-size: 16px; flex-shrink: 0; }
   .section-num {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 11px;
@@ -229,8 +237,21 @@
   .img-upload-text { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
   .img-upload-text .icon { font-size: 16px; }
   .img-preview-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .img-thumb-wrap { position: relative; }
+  .img-thumb-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .img-thumb { width: 64px; height: 48px; object-fit: cover; border: 1px solid var(--border); display: block; }
+  .img-caption-input {
+    width: 120px;
+    font-size: 10px;
+    padding: 3px 6px;
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Barlow', sans-serif;
+    outline: none;
+    resize: none;
+    text-align: center;
+  }
+  .img-caption-input:focus { border-color: var(--gold-dim); }
   .btn-remove-img {
     position: absolute; top: -5px; right: -5px;
     background: var(--danger); color: white; border: none;
@@ -239,10 +260,62 @@
     z-index: 2;
   }
 
-  /* Add section */
-  .btn-add-section {
-    margin-top: 8px;
+  /* Table editor */
+  .table-editor-wrap { overflow-x: auto; }
+  .table-editor {
+    border-collapse: collapse;
     width: 100%;
+    font-size: 13px;
+  }
+  .table-editor th, .table-editor td {
+    border: 1px solid var(--border);
+    padding: 0;
+    min-width: 90px;
+  }
+  .table-editor th { background: var(--dark4); }
+  .table-editor input.cell-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    padding: 7px 10px;
+    outline: none;
+  }
+  .table-editor th input.cell-input { font-weight: 700; color: var(--gold); }
+  .table-editor input.cell-input:focus { background: rgba(200,148,58,.05); }
+
+  .table-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .btn-table-ctrl {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-table-ctrl:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .btn-table-ctrl.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* Add section */
+  .add-section-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .btn-add-section {
+    flex: 1;
     padding: 14px;
     background: transparent;
     border: 1px dashed var(--mid);
@@ -256,6 +329,7 @@
     transition: all .2s;
   }
   .btn-add-section:hover { border-color: var(--gold-dim); color: var(--gold); background: rgba(200,148,58,.04); }
+  .btn-add-section.table-btn:hover { border-color: #2A6040; color: #5EC488; background: rgba(58,138,90,.04); }
 
   /* Action bar */
   .action-bar {
@@ -295,6 +369,7 @@
     transition: all .2s;
   }
   .btn-ghost:hover { border-color: var(--text-dim); color: var(--white); }
+  .btn-ghost:disabled { opacity: .5; cursor: not-allowed; }
 
   .divider { height: 1px; background: var(--border); margin: 4px 0; flex: 1; }
 
@@ -347,9 +422,19 @@
     margin: 32px auto;
     background: #fff;
     color: #1A1A1A;
-    padding: 60px 70px;
     font-family: 'Barlow', sans-serif;
     line-height: 1.7;
+  }
+
+  /* Each report page */
+  .rep-page {
+    background: #fff;
+    padding: 60px 70px;
+    min-height: 1100px;
+    position: relative;
+  }
+  .rep-page + .rep-page {
+    border-top: 4px solid #E8E8E8;
   }
 
   .rep-header {
@@ -411,6 +496,55 @@
     color: #333;
   }
 
+  /* TOC page */
+  .rep-toc-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #1A1A1A;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #C8943A;
+    margin-bottom: 28px;
+  }
+  .rep-toc-list { list-style: none; }
+  .rep-toc-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    padding: 9px 0;
+    border-bottom: 1px dotted #E0E0E0;
+  }
+  .rep-toc-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #C8943A;
+    letter-spacing: 2px;
+    min-width: 44px;
+    flex-shrink: 0;
+  }
+  .rep-toc-name {
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    flex: 1;
+  }
+  .rep-toc-type {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    margin-left: 8px;
+    flex-shrink: 0;
+  }
+  .rep-toc-type.text { background: #FFF5E5; color: #C8943A; border: 1px solid #F0D8A8; }
+  .rep-toc-type.table { background: #E5FFF0; color: #2A8050; border: 1px solid #A0D8B8; }
+
+  /* Section */
   .rep-section { margin-bottom: 40px; }
   .rep-section-title {
     font-family: 'Barlow Condensed', sans-serif;
@@ -443,16 +577,64 @@
   .rep-section-images {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 16px;
     margin-top: 16px;
   }
-  .rep-section-images img {
+  .rep-figure {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .rep-figure img {
     max-width: 100%;
     max-height: 320px;
     object-fit: contain;
     border: 1px solid #E8E8E8;
-    flex: 1 1 200px;
+    width: 100%;
   }
+  .rep-figure-caption {
+    font-size: 11px;
+    font-style: italic;
+    color: #888;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .rep-figure-num {
+    font-weight: 700;
+    color: #C8943A;
+    font-style: normal;
+  }
+
+  /* Report table */
+  .rep-table-wrap { overflow-x: auto; margin-top: 12px; }
+  .rep-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+  }
+  .rep-table th {
+    background: #C8943A;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 9px 14px;
+    text-align: left;
+    border: 1px solid #A87030;
+  }
+  .rep-table td {
+    padding: 8px 14px;
+    border: 1px solid #E8E8E8;
+    color: #333;
+    vertical-align: top;
+  }
+  .rep-table tr:nth-child(even) td { background: #FAFAFA; }
+  .rep-table tr:hover td { background: #FFF8EE; }
+
+  /* Footer */
   .rep-footer {
     border-top: 1px solid #E8E8E8;
     padding-top: 16px;
@@ -473,10 +655,43 @@
     opacity: .6;
   }
 
+  /* PDF progress */
+  #pdf-progress {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14,15,15,.92);
+    z-index: 2000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  #pdf-progress.show { display: flex; }
+  .pdf-progress-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .pdf-progress-bar-wrap {
+    width: 280px;
+    height: 3px;
+    background: var(--border);
+  }
+  .pdf-progress-bar {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width .3s ease;
+  }
+
   @media print {
     #report-overlay { position: static; background: none; overflow: visible; }
     .report-toolbar { display: none !important; }
-    #report-doc { margin: 0; box-shadow: none; padding: 40px; max-width: 100%; }
+    #report-doc { margin: 0; box-shadow: none; max-width: 100%; }
+    .rep-page { padding: 40px; min-height: auto; }
     body > #builder { display: none; }
   }
 </style>
@@ -535,7 +750,12 @@
 
   <!-- Sections -->
   <div class="sections-container" id="sections-container"></div>
-  <button class="btn-add-section" id="btn-add">+ Add Section</button>
+
+  <!-- Add section buttons -->
+  <div class="add-section-row">
+    <button class="btn-add-section" id="btn-add-text">+ Add Text Section</button>
+    <button class="btn-add-section table-btn" id="btn-add-table">⊞ Add Table Section</button>
+  </div>
 
   <!-- Actions -->
   <div class="action-bar">
@@ -549,30 +769,36 @@
 <div id="report-overlay">
   <div class="report-toolbar">
     <span>Report Preview</span>
-    <button class="btn-ghost" id="btn-print">🖨 Print</button>
     <button class="btn-ghost" id="btn-pdf">⬇ Download PDF</button>
-    <button class="btn-ghost" id="btn-pptx">⬇ Download PowerPoint</button>
     <button class="btn-primary" id="btn-close-report">✕ Close</button>
   </div>
   <div id="report-doc"></div>
 </div>
 
-<!-- <div id="toast">Report generated</div> -->
+<!-- ══ PDF PROGRESS ══ -->
+<div id="pdf-progress">
+  <div class="pdf-progress-text" id="pdf-progress-text">Generating PDF…</div>
+  <div class="pdf-progress-bar-wrap"><div class="pdf-progress-bar" id="pdf-progress-bar"></div></div>
+</div>
 
-<!-- pptx lib -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundled.js"></script>
+<div id="toast"></div>
+
+<!-- libs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 // ── State ──
 let sections = [];
 let logoDataUrl = null;
 let sectionIdCounter = 0;
+let globalFigureCounter = 0;
 
 // ── Init ──
 document.getElementById('field-date').valueAsDate = new Date();
-addSection('Executive Summary');
-addSection('Regional Geology');
-addSection('Exploration Results');
+addSection('Executive Summary', 'text');
+addSection('Regional Geology', 'text');
+addSection('Exploration Results', 'text');
 
 // ── Logo upload ──
 document.getElementById('logo-input').addEventListener('change', function(){
@@ -587,11 +813,23 @@ document.getElementById('logo-input').addEventListener('change', function(){
 });
 
 // ── Add section ──
-document.getElementById('btn-add').addEventListener('click', () => addSection());
+document.getElementById('btn-add-text').addEventListener('click', () => addSection('', 'text'));
+document.getElementById('btn-add-table').addEventListener('click', () => addSection('', 'table'));
 
-function addSection(defaultTitle='') {
+function addSection(defaultTitle='', type='text') {
   const id = ++sectionIdCounter;
-  sections.push({ id, title: defaultTitle, content: '', images: [] });
+  const sec = { id, title: defaultTitle, type, content: '', images: [] };
+  if(type === 'table') {
+    sec.tableData = {
+      headers: ['Column 1', 'Column 2', 'Column 3'],
+      rows: [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ]
+    };
+  }
+  sections.push(sec);
   renderSections();
 }
 
@@ -603,48 +841,139 @@ function renderSections(){
     const card = document.createElement('div');
     card.className = 'section-card';
     card.dataset.id = sec.id;
+
+    const badgeClass = sec.type === 'table' ? 'badge-table' : 'badge-text';
+    const badgeLabel = sec.type === 'table' ? 'Table' : 'Text';
+
+    let bodyHtml = '';
+    if(sec.type === 'text') {
+      bodyHtml = `
+        <div class="section-body">
+          <div>
+            <label>Content</label>
+            <textarea rows="5" placeholder="Write section content here… (leave blank to exclude)" data-field="content" data-id="${sec.id}">${escHtml(sec.content)}</textarea>
+          </div>
+          <div>
+            <label>Images <span style="color:var(--text-muted);font-weight:400;font-size:10px;letter-spacing:0">(optional captions per image)</span></label>
+            <div class="img-upload-area">
+              <input type="file" accept="image/*" multiple data-id="${sec.id}" class="img-file-input">
+              <div class="img-upload-text"><span class="icon">🖼</span> Upload images · any size & format</div>
+            </div>
+            <div class="img-preview-strip" id="preview-${sec.id}"></div>
+          </div>
+        </div>
+      `;
+    } else {
+      // table type
+      bodyHtml = buildTableEditorHtml(sec);
+    }
+
     card.innerHTML = `
       <div class="section-header" draggable="true">
         <span class="drag-handle">⠿</span>
         <span class="section-num">${String(idx+1).padStart(2,'0')}</span>
         <input class="section-title-input" type="text" placeholder="Section Title (optional)" value="${escHtml(sec.title)}" data-field="title" data-id="${sec.id}">
+        <span class="section-type-badge ${badgeClass}">${badgeLabel}</span>
         <button class="btn-remove" data-id="${sec.id}" title="Remove section">×</button>
       </div>
-      <div class="section-body">
-        <div>
-          <label>Content</label>
-          <textarea rows="5" placeholder="Write section content here… (leave blank to exclude)" data-field="content" data-id="${sec.id}">${escHtml(sec.content)}</textarea>
-        </div>
-        <div>
-          <label>Images</label>
-          <div class="img-upload-area">
-            <input type="file" accept="image/*" multiple data-id="${sec.id}" class="img-file-input">
-            <div class="img-upload-text"><span class="icon">🖼</span> Upload images · any size & format</div>
-          </div>
-          <div class="img-preview-strip" id="preview-${sec.id}"></div>
-        </div>
-      </div>
+      ${bodyHtml}
     `;
     container.appendChild(card);
 
-    // Restore images preview
-    const strip = document.getElementById(`preview-${sec.id}`);
-    sec.images.forEach((img, iIdx) => addThumb(strip, img.url, sec.id, iIdx));
+    // Restore images preview for text sections
+    if(sec.type === 'text') {
+      const strip = document.getElementById(`preview-${sec.id}`);
+      sec.images.forEach((img, iIdx) => addThumb(strip, img.url, img.caption || '', sec.id, iIdx));
+    }
   });
   bindEvents();
+}
+
+function buildTableEditorHtml(sec) {
+  const td = sec.tableData;
+  let headerCells = td.headers.map((h,ci) =>
+    `<th><input class="cell-input" type="text" value="${escHtml(h)}" data-role="header" data-id="${sec.id}" data-col="${ci}" placeholder="Header ${ci+1}"></th>`
+  ).join('');
+  let bodyRows = td.rows.map((row, ri) => {
+    let cells = row.map((cell, ci) =>
+      `<td><input class="cell-input" type="text" value="${escHtml(cell)}" data-role="cell" data-id="${sec.id}" data-row="${ri}" data-col="${ci}" placeholder="…"></td>`
+    ).join('');
+    return `<tr>${cells}</tr>`;
+  }).join('');
+
+  return `
+    <div class="section-body">
+      <div class="table-editor-wrap">
+        <table class="table-editor">
+          <thead><tr>${headerCells}</tr></thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+      </div>
+      <div class="table-controls">
+        <button class="btn-table-ctrl" data-action="add-col" data-id="${sec.id}">+ Column</button>
+        <button class="btn-table-ctrl" data-action="add-row" data-id="${sec.id}">+ Row</button>
+        <button class="btn-table-ctrl danger" data-action="del-col" data-id="${sec.id}">− Column</button>
+        <button class="btn-table-ctrl danger" data-action="del-row" data-id="${sec.id}">− Row</button>
+      </div>
+    </div>
+  `;
 }
 
 function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── Bind events ──
 function bindEvents(){
-  // Title / content change
-  document.querySelectorAll('[data-field]').forEach(el => {
+  // Title change
+  document.querySelectorAll('[data-field="title"]').forEach(el => {
     el.addEventListener('input', e => {
       const id = +e.target.dataset.id;
-      const field = e.target.dataset.field;
       const sec = sections.find(s=>s.id===id);
-      if(sec) sec[field] = e.target.value;
+      if(sec) sec.title = e.target.value;
+    });
+  });
+
+  // Content change (text sections)
+  document.querySelectorAll('[data-field="content"]').forEach(el => {
+    el.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const sec = sections.find(s=>s.id===id);
+      if(sec) sec.content = e.target.value;
+    });
+  });
+
+  // Table cell edits
+  document.querySelectorAll('.cell-input').forEach(el => {
+    el.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const sec = sections.find(s=>s.id===id);
+      if(!sec) return;
+      if(e.target.dataset.role === 'header') {
+        sec.tableData.headers[+e.target.dataset.col] = e.target.value;
+      } else {
+        sec.tableData.rows[+e.target.dataset.row][+e.target.dataset.col] = e.target.value;
+      }
+    });
+  });
+
+  // Table controls
+  document.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const id = +e.target.dataset.id;
+      const sec = sections.find(s=>s.id===id);
+      if(!sec) return;
+      const action = e.target.dataset.action;
+      const td = sec.tableData;
+      if(action === 'add-col') {
+        td.headers.push(`Column ${td.headers.length+1}`);
+        td.rows.forEach(r=>r.push(''));
+      } else if(action === 'add-row') {
+        td.rows.push(td.headers.map(()=>''));
+      } else if(action === 'del-col') {
+        if(td.headers.length > 1){ td.headers.pop(); td.rows.forEach(r=>r.pop()); }
+      } else if(action === 'del-row') {
+        if(td.rows.length > 1) td.rows.pop();
+      }
+      renderSections();
     });
   });
 
@@ -667,8 +996,8 @@ function bindEvents(){
         const fr = new FileReader();
         fr.onload = e2 => {
           const idx = sec.images.length;
-          sec.images.push({ url: e2.target.result, name: file.name });
-          addThumb(strip, e2.target.result, id, idx);
+          sec.images.push({ url: e2.target.result, name: file.name, caption: '' });
+          addThumb(strip, e2.target.result, '', id, idx);
         };
         fr.readAsDataURL(file);
       });
@@ -697,13 +1026,20 @@ function bindEvents(){
   });
 }
 
-function addThumb(strip, url, secId, iIdx){
+function addThumb(strip, url, caption, secId, iIdx){
   const wrap = document.createElement('div');
   wrap.className = 'img-thumb-wrap';
   wrap.innerHTML = `
     <img class="img-thumb" src="${url}" alt="img">
     <button class="btn-remove-img" data-sid="${secId}" data-iidx="${iIdx}" title="Remove">×</button>
+    <input class="img-caption-input" type="text" placeholder="Caption (optional)" value="${escHtml(caption)}" data-sid="${secId}" data-iidx="${iIdx}">
   `;
+  // caption sync
+  wrap.querySelector('.img-caption-input').addEventListener('input', e => {
+    const sid = +e.target.dataset.sid;
+    const sec = sections.find(s=>s.id===sid);
+    if(sec && sec.images[iIdx]) sec.images[iIdx].caption = e.target.value;
+  });
   wrap.querySelector('.btn-remove-img').addEventListener('click', e => {
     const sid = +e.target.dataset.sid;
     const sec = sections.find(s=>s.id===sid);
@@ -721,59 +1057,142 @@ document.getElementById('btn-generate').addEventListener('click', () => {
   const date    = document.getElementById('field-date').value;
   const ref     = document.getElementById('field-ref').value.trim();
 
-  // Filter sections with at least title, content, or images
-  const filled = sections.filter(s => s.title.trim() || s.content.trim() || s.images.length>0);
+  const filled = sections.filter(s =>
+    s.title.trim() || s.content.trim() || s.images.length > 0 ||
+    (s.type === 'table' && (s.tableData.headers.some(h=>h.trim()) || s.tableData.rows.some(r=>r.some(c=>c.trim()))))
+  );
 
   const dateStr = date ? new Date(date).toLocaleDateString('en-GB', {year:'numeric',month:'long',day:'numeric'}) : '';
 
+  // Build logo HTML
+  const logoHtml = logoDataUrl
+    ? `<div class="rep-logo-wrap"><img src="${logoDataUrl}" alt="logo"></div>`
+    : `<div class="rep-logo-placeholder">▲ ${escHtml(company)}</div>`;
+
+  // Build common header
+  function pageHeader() {
+    return `
+      <div class="rep-header">
+        ${logoHtml}
+        <div class="rep-meta">
+          <div class="rep-company-name">${escHtml(company)}</div>
+          <div class="rep-report-title">${escHtml(title)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function pageFooter(pageNum) {
+    return `
+      <div class="rep-footer">
+        <div class="rep-confidential">Confidential · ${escHtml(company)}</div>
+        <div>${dateStr || ''} &nbsp;&nbsp; Page ${pageNum}</div>
+      </div>
+    `;
+  }
+
+  // ── Page 1: Cover ──
   let metaRows = '';
   if(author) metaRows += `<div class="rep-info-item"><label>Prepared By</label><span>${escHtml(author)}</span></div>`;
   if(dateStr) metaRows += `<div class="rep-info-item"><label>Date</label><span>${dateStr}</span></div>`;
   if(ref) metaRows += `<div class="rep-info-item"><label>Reference</label><span>${escHtml(ref)}</span></div>`;
   if(filled.length) metaRows += `<div class="rep-info-item"><label>Sections</label><span>${filled.length}</span></div>`;
 
-  let sectionsHtml = '';
-  filled.forEach((sec, i) => {
-    const secTitle = sec.title.trim() || `Section ${i+1}`;
-    const imgsHtml = sec.images.length
-      ? `<div class="rep-section-images">${sec.images.map(img=>`<img src="${img.url}" alt="">`).join('')}</div>`
-      : '';
-    const bodyHtml = sec.content.trim()
-      ? `<div class="rep-section-body">${escHtml(sec.content)}</div>` : '';
-    sectionsHtml += `
-      <div class="rep-section">
-        <div class="rep-section-title">
-          <span class="rep-section-num">${String(i+1).padStart(2,'0')}</span>
-          ${escHtml(secTitle)}
-        </div>
-        ${bodyHtml}
-        ${imgsHtml}
-      </div>`;
-  });
-
-  const logoHtml = logoDataUrl
-    ? `<div class="rep-logo-wrap"><img src="${logoDataUrl}" alt="logo"></div>`
-    : `<div class="rep-logo-placeholder">▲ ${escHtml(company)}</div>`;
-
-  const html = `
-    <div class="rep-header">
-      ${logoHtml}
-      <div class="rep-meta">
-        <div class="rep-company-name">${escHtml(company)}</div>
-        <div class="rep-report-title">${escHtml(title)}</div>
-      </div>
-    </div>
-    ${metaRows ? `<div class="rep-info-row">${metaRows}</div>` : ''}
-    ${sectionsHtml}
-    <div class="rep-footer">
-      <div class="rep-confidential">Confidential · ${escHtml(company)}</div>
-      <div>${dateStr || ''}</div>
+  const page1 = `
+    <div class="rep-page" id="rep-page-1">
+      ${pageHeader()}
+      ${metaRows ? `<div class="rep-info-row">${metaRows}</div>` : ''}
+      ${pageFooter(1)}
     </div>
   `;
 
+  // ── Page 2: TOC ──
+  let tocItems = filled.map((sec, i) => {
+    const secTitle = sec.title.trim() || `Section ${i+1}`;
+    const typeLabel = sec.type === 'table' ? 'table' : 'text';
+    const typeCls   = sec.type === 'table' ? 'table' : 'text';
+    return `
+      <li>
+        <span class="rep-toc-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="rep-toc-name">${escHtml(secTitle)}</span>
+        <span class="rep-toc-type ${typeCls}">${typeLabel}</span>
+      </li>
+    `;
+  }).join('');
+
+  const page2 = `
+    <div class="rep-page" id="rep-page-2">
+      ${pageHeader()}
+      <div class="rep-toc-title">Table of Contents</div>
+      <ul class="rep-toc-list">${tocItems}</ul>
+      ${pageFooter(2)}
+    </div>
+  `;
+
+  // ── Content pages ──
+  let figureCount = 0;
+  let contentPages = '';
+  filled.forEach((sec, i) => {
+    const secTitle = sec.title.trim() || `Section ${i+1}`;
+
+    let sectionContent = '';
+    if(sec.type === 'text') {
+      const bodyHtml = sec.content.trim()
+        ? `<div class="rep-section-body">${escHtml(sec.content)}</div>` : '';
+
+      let imgsHtml = '';
+      if(sec.images.length) {
+        const figureItems = sec.images.map(img => {
+          figureCount++;
+          const captionLine = img.caption
+            ? `<span class="rep-figure-num">Figure ${figureCount}:</span> ${escHtml(img.caption)}`
+            : `<span class="rep-figure-num">Figure ${figureCount}</span>`;
+          return `
+            <div class="rep-figure">
+              <img src="${img.url}" alt="Figure ${figureCount}">
+              <div class="rep-figure-caption">${captionLine}</div>
+            </div>
+          `;
+        }).join('');
+        imgsHtml = `<div class="rep-section-images">${figureItems}</div>`;
+      }
+      sectionContent = bodyHtml + imgsHtml;
+    } else {
+      // table
+      const td = sec.tableData;
+      const headerCells = td.headers.map(h => `<th>${escHtml(h)}</th>`).join('');
+      const bodyRows = td.rows.map(row =>
+        `<tr>${row.map(cell=>`<td>${escHtml(cell)}</td>`).join('')}</tr>`
+      ).join('');
+      sectionContent = `
+        <div class="rep-table-wrap">
+          <table class="rep-table">
+            <thead><tr>${headerCells}</tr></thead>
+            <tbody>${bodyRows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    contentPages += `
+      <div class="rep-page" id="rep-section-${i+1}">
+        ${pageHeader()}
+        <div class="rep-section">
+          <div class="rep-section-title">
+            <span class="rep-section-num">${String(i+1).padStart(2,'0')}</span>
+            ${escHtml(secTitle)}
+          </div>
+          ${sectionContent}
+        </div>
+        ${pageFooter(i+3)}
+      </div>
+    `;
+  });
+
+  const html = page1 + page2 + contentPages;
   document.getElementById('report-doc').innerHTML = html;
   document.getElementById('report-overlay').classList.add('show');
-  showToast('');
+  showToast('Report ready — preview below');
 });
 
 // ── Close report ──
@@ -781,159 +1200,70 @@ document.getElementById('btn-close-report').addEventListener('click', () => {
   document.getElementById('report-overlay').classList.remove('show');
 });
 
-// ── Print ──
-document.getElementById('btn-print').addEventListener('click', () => window.print());
+// ── PDF Download ──
+document.getElementById('btn-pdf').addEventListener('click', async () => {
+  const { jsPDF } = window.jspdf;
+  const pages = document.querySelectorAll('#report-doc .rep-page');
+  if(!pages.length) { showToast('No pages to export'); return; }
 
-// ── PDF (browser print dialog → Save as PDF) ──
-// document.getElementById('btn-pdf').addEventListener('click', () => {
-//   showToast('Opening print dialog – choose Save as PDF');
-//   setTimeout(() => window.print(), 300);
-// });
+  const title = document.getElementById('field-title').value.trim() || 'Report';
+  const safeTitle = title.replace(/[^a-z0-9_-]/gi,'_');
 
-// ── PowerPoint ──
-document.getElementById('btn-pptx').addEventListener('click', async () => {
-  showToast('Building PowerPoint…');
-  const company = document.getElementById('field-company').value.trim() || 'Amaar Mining';
-  const title   = document.getElementById('field-title').value.trim() || 'Exploration Report';
-  const author  = document.getElementById('field-author').value.trim();
-  const date    = document.getElementById('field-date').value;
-  const ref     = document.getElementById('field-ref').value.trim();
-  const filled  = sections.filter(s => s.title.trim() || s.content.trim() || s.images.length>0);
+  showProgress(true, 0, 'Preparing…');
 
-  const pptx = new PptxGenJS();
-  pptx.layout = 'LAYOUT_WIDE';
-  pptx.author = author || company;
-  pptx.title  = title;
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const A4W = 210, A4H = 297;
 
-  const GOLD = 'C8943A';
-  const DARK = '0E0F0F';
-  const WHITE = 'F0F4F4';
-  const GREY = '888E8E';
+  for(let i = 0; i < pages.length; i++) {
+    const page = pages[i];
+    const pct = Math.round(((i+1)/pages.length)*100);
+    setProgress(Math.round((i/pages.length)*90), `Rendering page ${i+1} of ${pages.length}…`);
+    await new Promise(r => setTimeout(r, 50));
 
-  // ── Title slide ──
-  const slide0 = pptx.addSlide();
-  slide0.background = { color: DARK };
-  // Gold bar
-  slide0.addShape(pptx.ShapeType.rect, { x:0, y:4.8, w:13.33, h:.08, fill:{color:GOLD} });
-  // Company
-  slide0.addText(company.toUpperCase(), {
-    x:.6, y:1.5, w:12, h:1,
-    fontSize:40, bold:true, color:WHITE,
-    fontFace:'Calibri', charSpacing:6
-  });
-  // Title
-  slide0.addText(title, {
-    x:.6, y:2.5, w:12, h:.8,
-    fontSize:22, bold:false, color:GOLD,
-    fontFace:'Calibri', charSpacing:4
-  });
-  // Meta
-  let metaLines = [];
-  if(author) metaLines.push(`Prepared by: ${author}`);
-  const dateStr2 = date ? new Date(date).toLocaleDateString('en-GB', {year:'numeric',month:'long',day:'numeric'}) : '';
-  if(dateStr2) metaLines.push(dateStr2);
-  if(ref) metaLines.push(`Ref: ${ref}`);
-  if(metaLines.length){
-    slide0.addText(metaLines.join('   ·   '), {
-      x:.6, y:4.2, w:12, h:.4,
-      fontSize:11, color:GREY,
-      fontFace:'Calibri', charSpacing:2
+    const canvas = await html2canvas(page, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false
     });
-  }
 
-  // Logo on title slide
-  if(logoDataUrl){
-    try {
-      slide0.addImage({ data: logoDataUrl, x:10.5, y:.4, w:2.2, h:1.0, sizing:{type:'contain',w:2.2,h:1.0} });
-    } catch(e){}
-  }
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    const canvasW = canvas.width;
+    const canvasH = canvas.height;
+    const ratio = canvasH / canvasW;
+    const pdfH = Math.min(A4W * ratio, A4H * 3); // allow tall pages
 
-  // ── Content slides ──
-  filled.forEach((sec, i) => {
-    const secTitle = sec.title.trim() || `Section ${i+1}`;
-    const hasImages = sec.images.length > 0;
-    const hasContent = sec.content.trim().length > 0;
-
-    const slide = pptx.addSlide();
-    slide.background = { color: 'FFFFFF' };
-
-    // Gold top bar
-    slide.addShape(pptx.ShapeType.rect, { x:0, y:0, w:13.33, h:.08, fill:{color:GOLD} });
-    // Left accent
-    slide.addShape(pptx.ShapeType.rect, { x:0, y:.08, w:.04, h:7.42, fill:{color:GOLD} });
-
-    // Section number
-    slide.addText(String(i+1).padStart(2,'0'), {
-      x:.15, y:.2, w:.8, h:.4,
-      fontSize:10, bold:true, color:GOLD,
-      fontFace:'Calibri', charSpacing:2
-    });
-    // Title
-    slide.addText(secTitle.toUpperCase(), {
-      x:.15, y:.55, w:12.8, h:.55,
-      fontSize:22, bold:true, color:'1A1A1A',
-      fontFace:'Calibri', charSpacing:2
-    });
-    // Gold divider under title
-    slide.addShape(pptx.ShapeType.rect, { x:.15, y:1.12, w:12.9, h:.025, fill:{color:GOLD} });
-
-    if(hasImages && hasContent){
-      // Text left, images right
-      slide.addText(sec.content.trim(), {
-        x:.2, y:1.25, w:5.8, h:5.8,
-        fontSize:11, color:'333333', fontFace:'Calibri',
-        align:'justify', valign:'top', wrap:true
-      });
-      const imgs = sec.images.slice(0,4);
-      const cols = imgs.length === 1 ? 1 : 2;
-      const imgW = cols===1 ? 6.8 : 3.3;
-      const imgH = imgs.length<=2 ? 5.5 : 2.6;
-      imgs.forEach((img, j) => {
-        const col = j % cols;
-        const row = Math.floor(j / cols);
-        const x = 6.3 + col*(imgW+.15);
-        const y = 1.3 + row*(imgH+.12);
-        try {
-          slide.addImage({ data: img.url, x, y, w:imgW, h:imgH, sizing:{type:'contain',w:imgW,h:imgH} });
-        } catch(e){}
-      });
-    } else if(hasContent && !hasImages){
-      slide.addText(sec.content.trim(), {
-        x:.2, y:1.25, w:12.8, h:5.8,
-        fontSize:12, color:'333333', fontFace:'Calibri',
-        align:'justify', valign:'top', wrap:true
-      });
-    } else if(hasImages && !hasContent){
-      const imgs = sec.images.slice(0,6);
-      const cols = Math.min(imgs.length, 3);
-      const rows = Math.ceil(imgs.length / cols);
-      const imgW = (12.8 - (cols-1)*0.15) / cols;
-      const imgH = (5.6 - (rows-1)*0.12) / rows;
-      imgs.forEach((img, j) => {
-        const col = j % cols;
-        const row = Math.floor(j / cols);
-        try {
-          slide.addImage({ data: img.url, x:.2+col*(imgW+.15), y:1.3+row*(imgH+.12), w:imgW, h:imgH, sizing:{type:'contain',w:imgW,h:imgH} });
-        } catch(e){}
-      });
+    if(i > 0) pdf.addPage([A4W, pdfH], 'portrait');
+    else {
+      // re-init first page size
+      pdf.internal.pageSize.width = A4W;
+      pdf.internal.pageSize.height = pdfH;
     }
 
-    // Footer
-    slide.addShape(pptx.ShapeType.rect, { x:0, y:7.42, w:13.33, h:.08, fill:{color:GOLD} });
-    slide.addText(`${company.toUpperCase()}  ·  ${title.toUpperCase()}`, {
-      x:.2, y:7.24, w:10, h:.22,
-      fontSize:8, color:'BBBBBB', fontFace:'Calibri', charSpacing:1
-    });
-    slide.addText(String(i+2), {
-      x:12.8, y:7.24, w:.5, h:.22,
-      fontSize:8, color:'BBBBBB', fontFace:'Calibri', align:'right'
-    });
-  });
+    pdf.addImage(imgData, 'JPEG', 0, 0, A4W, pdfH);
+  }
 
-  const safeTitle = title.replace(/[^a-z0-9_-]/gi,'_');
-  await pptx.writeFile({ fileName: `${safeTitle}.pptx` });
-  showToast('PowerPoint downloaded!');
+  setProgress(98, 'Saving…');
+  await new Promise(r => setTimeout(r, 200));
+  pdf.save(`${safeTitle}.pdf`);
+  showProgress(false);
+  showToast('PDF downloaded!');
 });
+
+function showProgress(show, pct=0, msg='') {
+  const el = document.getElementById('pdf-progress');
+  if(show) {
+    el.classList.add('show');
+    setProgress(pct, msg);
+  } else {
+    el.classList.remove('show');
+  }
+}
+function setProgress(pct, msg) {
+  document.getElementById('pdf-progress-bar').style.width = pct + '%';
+  if(msg) document.getElementById('pdf-progress-text').textContent = msg;
+}
 
 // ── Reset ──
 document.getElementById('btn-reset').addEventListener('click', () => {
@@ -943,9 +1273,9 @@ document.getElementById('btn-reset').addEventListener('click', () => {
   document.getElementById('logo-preview-wrap').innerHTML = `<div class="logo-upload-label">↑ <span>Upload logo</span> · any format</div>`;
   ['field-company','field-title','field-author','field-ref'].forEach(id => document.getElementById(id).value='');
   document.getElementById('field-date').valueAsDate = new Date();
-  addSection('Executive Summary');
-  addSection('Regional Geology');
-  addSection('Exploration Results');
+  addSection('Executive Summary', 'text');
+  addSection('Regional Geology', 'text');
+  addSection('Exploration Results', 'text');
 });
 
 // ── Toast ──

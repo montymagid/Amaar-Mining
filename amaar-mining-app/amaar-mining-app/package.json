@@ -1,0 +1,32 @@
+{
+  "name": "amaar-mining-docs",
+  "version": "1.0.0",
+  "description": "Amaar Mining – Report & Meeting Minutes Generator",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.aaarmining.docs",
+    "productName": "Amaar Mining Docs",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "keywords": [],
+  "author": "Amaar Mining",
+  "license": "UNLICENSED"
+}

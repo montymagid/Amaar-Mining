@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amaar Mining · Report Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;background:#0C0E0E;color:#C4CACA}
+:root{--ac:#C8943A;--ac-d:#8A6020;--ac-l:#E8B860}
+
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* TOP BAR */
+.topbar{height:44px;background:#111414;border-bottom:1px solid #1E2424;display:flex;align-items:center;gap:0;flex-shrink:0;z-index:10}
+.tb-brand{display:flex;align-items:center;gap:10px;padding:0 18px;border-right:1px solid #1E2424;height:100%}
+.tb-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:#EEF0F0}
+.tb-name em{color:var(--ac);font-style:normal}
+.tb-sec{display:flex;align-items:center;gap:5px;padding:0 14px;border-right:1px solid #1E2424;height:100%}
+.tb-lbl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2E3535;margin-right:1px}
+.tb-b{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 8px;border:1px solid transparent;background:transparent;color:#5A6565;cursor:pointer;transition:all .12s}
+.tb-b:hover{color:#C4CACA;border-color:#252929}
+.tb-b.on{color:var(--ac);border-color:var(--ac-d);background:rgba(200,148,58,.07)}
+.tb-sp{flex:1}
+.pdf-btn{display:flex;align-items:center;gap:7px;padding:0 18px;height:100%;background:transparent;border:none;border-left:1px solid #1E2424;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9A9FA0;cursor:pointer;transition:all .15s}
+.pdf-btn:hover{background:rgba(200,148,58,.1);color:var(--ac-l)}
+
+/* LAYOUT */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* LEFT PANEL */
+.lp{width:355px;flex-shrink:0;background:#0F1212;border-right:1px solid #1A1E1E;display:flex;flex-direction:column;overflow:hidden}
+.tabs{display:flex;height:36px;border-bottom:1px solid #1A1E1E;flex-shrink:0}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2E3535;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;user-select:none}
+.tab:hover{color:#5A6565}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+.pane{flex:1;overflow-y:auto;overflow-x:hidden}
+.pane::-webkit-scrollbar{width:3px}
+.pane::-webkit-scrollbar-thumb{background:#1A1E1E}
+
+/* FIELD BLOCKS — no boxes, just grouped with a subtle divider label */
+.grp{padding:18px 20px 4px}
+.grp-lbl{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#252E2E;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.grp-lbl::after{content:'';flex:1;height:1px;background:#141818}
+.row{display:flex;gap:14px;margin-bottom:14px}
+.f{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
+.fl{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#344040}
+/* underline-only inputs */
+.f input[type=text],.f select,.f textarea{background:transparent;border:none;border-bottom:1px solid #181E1E;color:#B8BEBE;font-family:'Barlow',sans-serif;font-size:13px;padding:5px 0;outline:none;width:100%;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-bottom-color:var(--ac-d)}
+.f input::placeholder,.f textarea::placeholder{color:#252E2E;font-size:12px}
+.f select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23344040'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 2px center;padding-right:16px;cursor:pointer}
+.f select option{background:#111414}
+.f textarea{resize:none;line-height:1.6;font-size:12px}
+
+/* logo zone */
+.lz{border:1px dashed #181E1E;min-height:50px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden;margin-top:5px}
+.lz:hover{border-color:var(--ac-d)}
+.lz input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.lz img{max-height:42px;max-width:100%;object-fit:contain}
+.lz-hint{font-size:11px;color:#252E2E}
+.lz-hint b{color:var(--ac-d);font-weight:400}
+.act{font-size:10px;color:#2E3535;cursor:pointer;margin-top:4px;display:inline-block;transition:color .12s}
+.act:hover{color:#C04040}
+
+/* photo strip */
+.ph-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.ph-w{position:relative}
+.ph-t{width:56px;height:38px;object-fit:cover;display:block;opacity:.8}
+.ph-rm{position:absolute;top:1px;right:1px;background:rgba(0,0,0,.7);color:#fff;border:none;width:13px;height:13px;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s}
+.ph-w:hover .ph-rm{opacity:1}
+.urow{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;border-bottom:1px dashed #181E1E;margin-top:5px;transition:border-color .15s;position:relative}
+.urow:hover{border-color:var(--ac-d)}
+.urow input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.urow-txt{font-size:11px;color:#2E3535}
+
+/* swatches */
+.sws{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.sw{width:22px;height:22px;border:2px solid transparent;cursor:pointer;transition:all .12s}
+.sw:hover{transform:scale(1.2)}
+.sw.on{border-color:#EEF0F0}
+
+/* style tab fields */
+.stf{padding:0 20px;margin-bottom:14px}
+.stf label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#344040;display:block;margin-bottom:6px}
+.stf input[type=text],.stf select{background:transparent;border:none;border-bottom:1px solid #181E1E;color:#B8BEBE;font-family:'Barlow',sans-serif;font-size:13px;padding:4px 0;outline:none;width:100%;transition:border-color .15s;-webkit-appearance:none}
+.stf input:focus,.stf select:focus{border-bottom-color:var(--ac-d)}
+.stf select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23344040'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 2px center;padding-right:16px;cursor:pointer}
+.stf select option{background:#111414}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.st-sep{height:1px;background:#141818;margin:18px 20px 14px;position:relative}
+.st-sep::before{content:attr(data-l);position:absolute;top:-8px;left:0;background:#0F1212;padding-right:8px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#252E2E}
+
+/* SECTIONS */
+.sl{padding:12px 0 0}
+.si{border-bottom:1px solid #131717;position:relative}
+.si.drag-over{background:rgba(200,148,58,.04)}
+.sh{display:flex;align-items:center;gap:7px;padding:10px 20px;cursor:grab;user-select:none}
+.sh:active{cursor:grabbing}
+.dh{color:#202828;font-size:11px;flex-shrink:0;letter-spacing:-1px;line-height:1}
+.snum{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--ac-d);min-width:18px}
+.sti{flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:#B8BEBE;font-family:'Barlow',sans-serif;font-size:13px;padding:1px 0 2px;outline:none;transition:border-color .15s;min-width:0}
+.sti:focus{border-bottom-color:var(--ac-d)}
+.sti::placeholder{color:#252E2E;font-size:12px}
+.stag{font-size:8px;font-weight:700;letter-spacing:2px;padding:2px 5px;text-transform:uppercase;flex-shrink:0}
+.stag.txt{color:#3A4545;border:1px solid #181E1E}
+.stag.tbl{color:#2A4A5A;border:1px solid #182028}
+.sbtns{display:flex;gap:1px;align-items:center;flex-shrink:0}
+.ib{background:none;border:none;cursor:pointer;color:#1E2828;font-size:13px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;transition:color .12s;line-height:1}
+.ib:hover{color:#8A9090}
+.ib.del:hover{color:#C04040}
+.sb{padding:0 20px 14px}
+
+/* format bar */
+.fb-bar{display:flex;align-items:center;gap:2px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid #131717;margin-bottom:8px}
+.fb{background:none;border:none;color:#3A4545;font-size:11px;width:24px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .12s;border-radius:2px;font-family:'Barlow',sans-serif}
+.fb:hover{color:#C4CACA;background:#161A1A}
+.fsep{width:1px;height:14px;background:#181E1E;margin:0 2px;flex-shrink:0}
+.fsl{background:transparent;border:none;border-bottom:1px solid #181E1E;color:#3A4545;font-size:10px;padding:1px 3px;cursor:pointer;height:22px;font-family:'Barlow',sans-serif;outline:none}
+.fsl option{background:#111414}
+.csw{width:14px;height:14px;cursor:pointer;transition:transform .1s;flex-shrink:0}
+.csw:hover{transform:scale(1.3)}
+
+/* contenteditable */
+.ced{min-height:80px;color:#8A9595;font-size:13px;font-family:'Barlow',sans-serif;line-height:1.7;padding:8px 0;outline:none;caret-color:var(--ac)}
+.ced:empty::before{content:attr(data-ph);color:#1E2828;pointer-events:none}
+.ced p,.ced div{margin-bottom:5px}
+.ced b,.ced strong{color:#B8BEBE}
+.ced h2{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#B8BEBE;margin:7px 0 3px}
+
+/* table editor */
+.ted{margin-top:8px}
+.ted-hd{display:flex;gap:5px;margin-bottom:6px}
+.mb{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;background:transparent;border:1px solid #181E1E;color:#2E3535;cursor:pointer;transition:all .12s}
+.mb:hover{border-color:var(--ac-d);color:var(--ac)}
+.ts{overflow-x:auto}
+.te{border-collapse:collapse;min-width:100%}
+.te th,.te td{border:1px solid #141818;padding:0}
+.te th{background:#141818}
+.te th input,.te td input{width:100%;background:transparent;border:none;padding:5px 7px;font-size:11px;outline:none;font-family:'Barlow',sans-serif;min-width:65px}
+.te th input{color:var(--ac-d);font-weight:600}
+.te td input{color:#6A7575}
+.te th input:focus,.te td input:focus{background:rgba(200,148,58,.04)}
+.rcb,.rrb{background:none;border:none;color:#1E2828;font-size:9px;cursor:pointer;padding:0 3px;transition:color .1s}
+.rcb:hover,.rrb:hover{color:#C04040}
+
+/* section image zone */
+.siz{display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 0;border-bottom:1px dashed #181E1E;position:relative;transition:border-color .12s;margin-top:9px}
+.siz:hover{border-color:var(--ac-d)}
+.siz input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.siz-txt{font-size:10px;color:#252E2E}
+.sis{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.siw{position:relative}
+.sit{width:52px;height:36px;object-fit:cover;display:block;opacity:.75}
+.sirm{position:absolute;top:1px;right:1px;background:rgba(0,0,0,.75);color:#fff;border:none;width:12px;height:12px;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .1s}
+.siw:hover .sirm{opacity:1}
+
+.add-row{display:flex;border-top:1px solid #131717;flex-shrink:0}
+.ab{flex:1;padding:10px;background:transparent;border:none;border-right:1px solid #131717;color:#252E2E;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.ab:last-child{border-right:none}
+.ab:hover{color:var(--ac);background:rgba(200,148,58,.04)}
+
+/* RIGHT PANEL */
+.rp{flex:1;background:#161919;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:24px 20px 60px;gap:0}
+.rp::-webkit-scrollbar{width:5px;height:5px}
+.rp::-webkit-scrollbar-track{background:#141616}
+.rp::-webkit-scrollbar-thumb{background:#222626}
+
+/* page shell — holds controls + white page */
+.ps{position:relative;margin-bottom:24px;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start}
+.pc{display:flex;align-items:center;gap:3px;margin-bottom:6px;opacity:0;transition:opacity .15s;height:24px}
+.ps:hover .pc{opacity:1}
+.pcb{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;background:#111414;border:1px solid #1E2424;color:#5A6565;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:3px}
+.pcb:hover{border-color:var(--ac-d);color:var(--ac)}
+.pcb:disabled{opacity:.25;cursor:default;pointer-events:none}
+.pclbl{font-family:'Space Mono',monospace;font-size:9px;color:#2E3535;padding:0 6px;letter-spacing:.5px}
+
+/* THE WHITE PAGE */
+.wpg{background:#fff;color:#1A1A1A;overflow:hidden;box-shadow:0 3px 20px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04);transform-origin:top left}
+
+/* print styles */
+@media print{
+  body,.shell,.main,.rp{overflow:visible!important;height:auto!important;display:block!important}
+  .topbar,.lp,.pc{display:none!important}
+  .rp{padding:0!important;background:white!important}
+  .wpg{box-shadow:none!important;page-break-after:always;break-after:page}
+  .ps{margin:0!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="topbar">
+  <div class="tb-brand"><div class="tb-name">Amaar <em>Mining</em></div></div>
+  <div class="tb-sec">
+    <span class="tb-lbl">Paper</span>
+    <button class="tb-b on" data-p="A4" onclick="setPaper(this)">A4</button>
+    <button class="tb-b" data-p="Letter" onclick="setPaper(this)">Letter</button>
+    <button class="tb-b" data-p="Legal" onclick="setPaper(this)">Legal</button>
+    <button class="tb-b" data-p="A3" onclick="setPaper(this)">A3</button>
+  </div>
+  <div class="tb-sec">
+    <span class="tb-lbl">Zoom</span>
+    <button class="tb-b" onclick="chgZ(-10)" style="padding:3px 6px">−</button>
+    <span id="zpct" style="font-family:'Space Mono',monospace;font-size:10px;color:#4A5555;min-width:32px;text-align:center">75%</span>
+    <button class="tb-b" onclick="chgZ(10)" style="padding:3px 6px">+</button>
+    <button class="tb-b" onclick="fitZ()">Fit</button>
+  </div>
+  <div class="tb-sp"></div>
+  <button class="pdf-btn" onclick="doPDF()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Download PDF
+  </button>
+</div>
+
+<div class="main">
+  <div class="lp">
+    <div class="tabs">
+      <div class="tab on" onclick="showTab('cover',this)">Cover</div>
+      <div class="tab" onclick="showTab('sections',this)">Sections</div>
+      <div class="tab" onclick="showTab('style',this)">Style</div>
+    </div>
+
+    <!-- COVER TAB -->
+    <div class="pane" id="tab-cover">
+      <div class="grp">
+        <div class="grp-lbl">Identity</div>
+        <div class="row"><div class="f"><span class="fl">Company</span><input type="text" id="f-co" placeholder="Amaar Mining" value="Amaar Mining" oninput="render()"></div></div>
+        <div class="row"><div class="f"><span class="fl">Report Title</span><input type="text" id="f-title" placeholder="e.g. Al Nuqrah EL Relinquishment Report" oninput="render()"></div></div>
+        <div class="row">
+          <div class="f"><span class="fl">Department</span><input type="text" id="f-dept" placeholder="Exploration Dept." oninput="render()"></div>
+          <div class="f"><span class="fl">Date</span><input type="text" id="f-date" placeholder="December 2024" oninput="render()"></div>
+        </div>
+        <div class="row">
+          <div class="f"><span class="fl">Ref / Licence No.</span><input type="text" id="f-ref" placeholder="EL-2024-0087" oninput="render()"></div>
+          <div class="f"><span class="fl">Version</span><input type="text" id="f-ver" placeholder="Rev. 1.0" oninput="render()"></div>
+        </div>
+        <div class="row"><div class="f"><span class="fl">Confidentiality</span>
+          <select id="f-conf" onchange="render()">
+            <option>Confidential</option><option>Strictly Confidential</option><option>Internal Use Only</option><option>Public</option>
+          </select>
+        </div></div>
+      </div>
+      <div class="grp" style="padding-top:14px">
+        <div class="grp-lbl">Signatures</div>
+        <div class="row">
+          <div class="f"><span class="fl">Prepared By</span><input type="text" id="f-prep" placeholder="Name & Role" oninput="render()"></div>
+          <div class="f"><span class="fl">Reviewed By</span><input type="text" id="f-rev" placeholder="Name & Role" oninput="render()"></div>
+        </div>
+        <div class="row"><div class="f"><span class="fl">Approved By</span><input type="text" id="f-appr" placeholder="Name & Role" oninput="render()"></div></div>
+      </div>
+      <div class="grp" style="padding-top:14px;padding-bottom:20px">
+        <div class="grp-lbl">Visuals</div>
+        <div class="f" style="margin-bottom:8px"><span class="fl">Company Logo</span>
+          <div class="lz" id="lz"><input type="file" id="logo-inp" accept="image/*"><div id="lz-in"><span class="lz-hint">↑ Upload logo &nbsp;·&nbsp; <b>PNG  JPG  SVG</b></span></div></div>
+          <span class="act" onclick="clearLogo()">Remove logo</span>
+        </div>
+        <div class="f"><span class="fl" style="display:block;margin-bottom:5px">Cover Photos</span>
+          <div class="urow"><input type="file" id="site-inp" accept="image/*" multiple><span class="urow-txt">↑ Upload site photos — shown as cover strip</span></div>
+          <div class="ph-row" id="ph-row"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTIONS TAB -->
+    <div class="pane" id="tab-sections" style="display:none;display:flex;flex-direction:column">
+      <div class="sl" id="sl"></div>
+      <div class="add-row" style="margin-top:auto">
+        <button class="ab" onclick="addSec('content')">+ Text Section</button>
+        <button class="ab" onclick="addSec('table')">⊞ Table</button>
+      </div>
+    </div>
+
+    <!-- STYLE TAB -->
+    <div class="pane" id="tab-style" style="display:none">
+      <div style="padding:18px 20px 4px">
+        <div class="grp-lbl">Accent Color</div>
+        <div class="sws">
+          <div class="sw on" style="background:#C8943A" data-c="#C8943A" onclick="setAc(this)"></div>
+          <div class="sw" style="background:#1A5494" data-c="#1A5494" onclick="setAc(this)"></div>
+          <div class="sw" style="background:#3A7A5A" data-c="#3A7A5A" onclick="setAc(this)"></div>
+          <div class="sw" style="background:#7A3A5A" data-c="#7A3A5A" onclick="setAc(this)"></div>
+          <div class="sw" style="background:#4A4A4A" data-c="#4A4A4A" onclick="setAc(this)"></div>
+          <div class="sw" style="background:#8A3A1A" data-c="#8A3A1A" onclick="setAc(this)"></div>
+          <div class="sw" style="background:#1A6070" data-c="#1A6070" onclick="setAc(this)"></div>
+          <div class="sw" style="background:#5A1A7A" data-c="#5A1A7A" onclick="setAc(this)"></div>
+        </div>
+      </div>
+      <div class="st-sep" data-l="Typography"></div>
+      <div class="stf"><label>Body Font</label>
+        <select id="st-font" onchange="render()">
+          <option value="'Barlow',sans-serif">Barlow — Modern</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond — Serif</option>
+          <option value="'Space Mono',monospace">Space Mono — Technical</option>
+          <option value="Georgia,serif">Georgia — Classic</option>
+        </select>
+      </div>
+      <div class="g2" style="padding:0 20px;margin-bottom:14px">
+        <div class="stf" style="padding:0"><label>Body Size (px)</label><input type="text" id="st-fs" value="13" oninput="render()"></div>
+        <div class="stf" style="padding:0"><label>Line Height</label><input type="text" id="st-lh" value="1.8" oninput="render()"></div>
+      </div>
+      <div class="g2" style="padding:0 20px;margin-bottom:14px">
+        <div class="stf" style="padding:0"><label>Heading Size (px)</label><input type="text" id="st-hs" value="20" oninput="render()"></div>
+        <div class="stf" style="padding:0"><label>Text Align</label>
+          <select id="st-ta" onchange="render()"><option value="justify">Justify</option><option value="left">Left</option><option value="center">Center</option></select>
+        </div>
+      </div>
+      <div class="st-sep" data-l="Margins"></div>
+      <div class="g2" style="padding:0 20px;margin-bottom:14px">
+        <div class="stf" style="padding:0"><label>Vertical (px)</label><input type="text" id="st-mv" value="48" oninput="render()"></div>
+        <div class="stf" style="padding:0"><label>Horizontal (px)</label><input type="text" id="st-mh" value="60" oninput="render()"></div>
+      </div>
+      <div class="st-sep" data-l="Images"></div>
+      <div class="g2" style="padding:0 20px;margin-bottom:14px">
+        <div class="stf" style="padding:0"><label>Max Height (px)</label><input type="text" id="st-ih" value="320" oninput="render()"></div>
+        <div class="stf" style="padding:0"><label>Cover Strip H</label><input type="text" id="st-ch" value="110" oninput="render()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PREVIEW -->
+  <div class="rp" id="rp"></div>
+</div>
+</div>
+
+<script>
+const PAPERS={A4:{w:794,h:1123},Letter:{w:816,h:1056},Legal:{w:816,h:1344},A3:{w:1123,h:1587}};
+const S={paper:'A4',accent:'#C8943A',logo:null,siteImgs:[],sections:[],sid:0,zoom:75};
+
+window.addEventListener('load',()=>{
+  ['Executive Summary','Regional Geology','Exploration Methods','Location & Active Areas','Historical Work'].forEach(t=>addSec('content',t,false));
+  render(); fitZ();
+});
+
+/* TABS */
+function showTab(n,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); el.classList.add('on');
+  ['cover','sections','style'].forEach(id=>document.getElementById('tab-'+id).style.display=id===n?'':'none');
+  if(n==='sections') document.getElementById('tab-sections').style.display='flex';
+}
+
+/* PAPER / ZOOM */
+function setPaper(el){document.querySelectorAll('[data-p]').forEach(b=>b.classList.remove('on'));el.classList.add('on');S.paper=el.dataset.p;render();}
+function chgZ(d){S.zoom=Math.max(20,Math.min(200,S.zoom+d));render();}
+function fitZ(){const P=PAPERS[S.paper];const av=document.getElementById('rp').clientWidth-44;S.zoom=Math.floor(av/P.w*100);S.zoom=Math.max(25,Math.min(150,S.zoom));render();}
+function setAc(el){document.querySelectorAll('.sw').forEach(s=>s.classList.remove('on'));el.classList.add('on');S.accent=el.dataset.c;render();}
+
+/* LOGO */
+document.getElementById('logo-inp').addEventListener('change',function(){
+  if(!this.files[0])return;
+  readFile(this.files[0],url=>{S.logo=url;document.getElementById('lz-in').innerHTML=`<img src="${url}" style="max-height:42px;max-width:100%;object-fit:contain">`;render();});
+  this.value='';
+});
+function clearLogo(){S.logo=null;document.getElementById('lz-in').innerHTML=`<span class="lz-hint">↑ Upload logo &nbsp;·&nbsp; <b>PNG  JPG  SVG</b></span>`;render();}
+
+/* SITE IMAGES */
+document.getElementById('site-inp').addEventListener('change',function(){
+  Array.from(this.files).forEach(f=>readFile(f,url=>{S.siteImgs.push(url);renderPR();render();}));this.value='';
+});
+function renderPR(){const r=document.getElementById('ph-row');r.innerHTML='';S.siteImgs.forEach((u,i)=>{const w=mk('div','ph-w');w.innerHTML=`<img class="ph-t" src="${u}"><button class="ph-rm" onclick="rmSI(${i})">×</button>`;r.appendChild(w);});}
+function rmSI(i){S.siteImgs.splice(i,1);renderPR();render();}
+
+/* SECTIONS */
+function addSec(type,title='',doR=true){
+  S.sections.push({id:++S.sid,type,title,content:'',images:[],collapsed:false,
+    headers:type==='table'?['Column 1','Column 2','Column 3']:null,
+    rows:type==='table'?[['','',''],['','','']]:null});
+  renderSL(); if(doR) render();
+}
+
+function renderSL(){
+  const list=document.getElementById('sl'); list.innerHTML='';
+  S.sections.forEach((sec,idx)=>{
+    const div=mk('div','si'); div.dataset.id=sec.id; div.draggable=true;
+    /* head */
+    const head=mk('div','sh');
+    head.innerHTML=`<span class="dh">⠿</span><span class="snum">${String(idx+1).padStart(2,'0')}</span>
+      <input class="sti" type="text" placeholder="Section title" value="${esc(sec.title)}"
+        onclick="event.stopPropagation()" oninput="sF(${sec.id},'title',this.value)">
+      <span class="stag ${sec.type}">${sec.type==='table'?'TBL':'TXT'}</span>
+      <div class="sbtns">
+        <button class="ib" onclick="event.stopPropagation();mvS(${sec.id},-1)" title="Up">↑</button>
+        <button class="ib" onclick="event.stopPropagation();mvS(${sec.id},1)" title="Down">↓</button>
+        <button class="ib del" onclick="event.stopPropagation();rmS(${sec.id})">×</button>
+      </div>`;
+    head.addEventListener('click',()=>{sec.collapsed=!sec.collapsed;renderSL();});
+    div.appendChild(head);
+
+    if(!sec.collapsed){
+      const body=mk('div','sb');
+      /* FORMAT BAR */
+      const fbar=mk('div','fb-bar');
+      fbar.innerHTML=`
+        <select class="fsl" onchange="ef('fontName',this.value,${sec.id})" style="width:74px">
+          <option value="Barlow,sans-serif">Barlow</option>
+          <option value="'Cormorant Garamond',serif">Garamond</option>
+          <option value="'Space Mono',monospace">Mono</option>
+          <option value="Arial,sans-serif">Arial</option>
+          <option value="'Times New Roman',serif">Times</option>
+        </select>
+        <select class="fsl" onchange="ef('fontSize',this.value,${sec.id})" style="width:38px">
+          ${[8,9,10,11,12,13,14,16,18,20,24,28,32].map(s=>`<option${s===13?' selected':''}>${s}</option>`).join('')}
+        </select>
+        <div class="fsep"></div>
+        <button class="fb" onclick="ef('bold',null,${sec.id})"><b>B</b></button>
+        <button class="fb" onclick="ef('italic',null,${sec.id})"><i>I</i></button>
+        <button class="fb" onclick="ef('underline',null,${sec.id})"><u>U</u></button>
+        <button class="fb" onclick="ef('strikeThrough',null,${sec.id})"><s>S</s></button>
+        <div class="fsep"></div>
+        <button class="fb" onclick="ef('justifyLeft',null,${sec.id})" title="Left" style="font-size:9px">⬛</button>
+        <button class="fb" onclick="ef('justifyCenter',null,${sec.id})" title="Center" style="font-size:9px">▪</button>
+        <button class="fb" onclick="ef('justifyFull',null,${sec.id})" title="Justify" style="font-size:9px">▤</button>
+        <div class="fsep"></div>
+        <button class="fb" onclick="ef('insertUnorderedList',null,${sec.id})" style="font-size:9px">•≡</button>
+        <button class="fb" onclick="ef('insertOrderedList',null,${sec.id})" style="font-size:9px">1≡</button>
+        <button class="fb" onclick="ef('formatBlock','h2',${sec.id})" style="font-weight:700">H</button>
+        <button class="fb" onclick="ef('formatBlock','p',${sec.id})" style="font-size:10px">¶</button>
+        <div class="fsep"></div>
+        <div class="csw" style="background:#222" onclick="ef('foreColor','#222',${sec.id})" title="Dark"></div>
+        <div class="csw" style="background:#C8943A" onclick="ef('foreColor','#C8943A',${sec.id})" title="Gold"></div>
+        <div class="csw" style="background:#1A5494" onclick="ef('foreColor','#1A5494',${sec.id})" title="Blue"></div>
+        <div class="csw" style="background:#C04040" onclick="ef('foreColor','#C04040',${sec.id})" title="Red"></div>
+        <div class="csw" style="background:#3A7A5A" onclick="ef('foreColor','#3A7A5A',${sec.id})" title="Green"></div>
+        <div class="fsep"></div>
+        <div class="csw" style="background:#FFEFC0" onclick="ef('hiliteColor','#FFEFC0',${sec.id})" title="Yellow HL"></div>
+        <div class="csw" style="background:#C8F0D8" onclick="ef('hiliteColor','#C8F0D8',${sec.id})" title="Green HL"></div>
+        <div class="csw" style="background:#CCE0FF" onclick="ef('hiliteColor','#CCE0FF',${sec.id})" title="Blue HL"></div>`;
+      body.appendChild(fbar);
+      /* EDITOR */
+      const ed=mk('div','ced'); ed.contentEditable=true; ed.dataset.ph='Type content here…'; ed.innerHTML=sec.content;
+      ed.id=`ced-${sec.id}`;
+      ed.addEventListener('input',()=>{sec.content=ed.innerHTML;render();});
+      body.appendChild(ed);
+      /* TABLE */
+      if(sec.type==='table'){
+        const te=mk('div','ted');
+        const th=mk('div','ted-hd'); th.innerHTML=`<button class="mb" onclick="tAC(${sec.id})">+ Col</button><button class="mb" onclick="tAR(${sec.id})">+ Row</button>`; te.appendChild(th);
+        const ts=mk('div','ts');
+        const t=mk('table','te');
+        const tr0=document.createElement('tr');
+        sec.headers.forEach((h,ci)=>{
+          const th2=document.createElement('th'); th2.style.position='relative';
+          const inp=document.createElement('input'); inp.type='text'; inp.value=h;
+          inp.addEventListener('input',e=>{sec.headers[ci]=e.target.value;render();});
+          th2.appendChild(inp);
+          if(sec.headers.length>1){const rb=document.createElement('button');rb.className='rcb';rb.textContent='×';rb.onclick=()=>tRC(sec.id,ci);th2.appendChild(rb);}
+          tr0.appendChild(th2);
+        });
+        const thX=document.createElement('th'); thX.style.cssText='width:14px;border:1px solid #141818'; tr0.appendChild(thX);
+        const thead=document.createElement('thead'); thead.appendChild(tr0); t.appendChild(thead);
+        const tbody=document.createElement('tbody');
+        sec.rows.forEach((row,ri)=>{
+          const tr=document.createElement('tr');
+          row.forEach((c,ci)=>{
+            const td=document.createElement('td');
+            const inp=document.createElement('input'); inp.type='text'; inp.value=c;
+            inp.addEventListener('input',e=>{sec.rows[ri][ci]=e.target.value;render();});
+            td.appendChild(inp); tr.appendChild(td);
+          });
+          const td2=document.createElement('td'); td2.style.cssText='border:none;padding:0 2px';
+          if(sec.rows.length>1){const rb=document.createElement('button');rb.className='rrb';rb.textContent='×';rb.onclick=()=>tRR(sec.id,ri);td2.appendChild(rb);}
+          tr.appendChild(td2); tbody.appendChild(tr);
+        });
+        t.appendChild(tbody); ts.appendChild(t); te.appendChild(ts); body.appendChild(te);
+      }
+      /* IMAGES */
+      const iz=mk('div','');
+      iz.innerHTML=`<div class="siz"><input type="file" accept="image/*" multiple class="sii" data-sid="${sec.id}"><span class="siz-txt">↑ Add figures</span></div><div class="sis" id="sis-${sec.id}"></div>`;
+      body.appendChild(iz);
+      div.appendChild(body);
+      renderSIS(sec);
+      iz.querySelector('.sii').addEventListener('change',function(){
+        const s=S.sections.find(s=>s.id===+this.dataset.sid);
+        Array.from(this.files).forEach(f=>readFile(f,url=>{s.images.push({url});renderSIS(s);render();}));
+        this.value='';
+      });
+    }
+
+    /* DRAG */
+    div.addEventListener('dragstart',e=>{window._dId=sec.id;e.dataTransfer.effectAllowed='move';setTimeout(()=>div.style.opacity='.4',0);});
+    div.addEventListener('dragend',()=>{div.style.opacity='1';});
+    div.addEventListener('dragover',e=>{e.preventDefault();div.classList.add('drag-over');});
+    div.addEventListener('dragleave',()=>div.classList.remove('drag-over'));
+    div.addEventListener('drop',e=>{
+      e.preventDefault(); div.classList.remove('drag-over');
+      const fi=S.sections.findIndex(s=>s.id===window._dId);
+      const ti=S.sections.findIndex(s=>s.id===sec.id);
+      if(fi<0||ti<0||fi===ti)return;
+      const[it]=S.sections.splice(fi,1); S.sections.splice(ti,0,it);
+      renderSL(); render();
+    });
+    list.appendChild(div);
+  });
+}
+
+function renderSIS(sec){
+  const s=document.getElementById(`sis-${sec.id}`); if(!s)return; s.innerHTML='';
+  sec.images.forEach((img,i)=>{
+    const w=mk('div','siw'); w.innerHTML=`<img class="sit" src="${img.url}"><button class="sirm" onclick="rmSImg(${sec.id},${i})">×</button>`;
+    s.appendChild(w);
+  });
+}
+function rmSImg(sid,i){const s=S.sections.find(s=>s.id===sid);if(s){s.images.splice(i,1);renderSIS(s);render();}}
+function sF(id,f,v){const s=S.sections.find(s=>s.id===id);if(s){s[f]=v;render();}}
+function mvS(id,dir){const i=S.sections.findIndex(s=>s.id===id);const ni=i+dir;if(ni<0||ni>=S.sections.length)return;[S.sections[i],S.sections[ni]]=[S.sections[ni],S.sections[i]];renderSL();render();}
+function rmS(id){S.sections=S.sections.filter(s=>s.id!==id);renderSL();render();}
+function tAC(sid){const s=S.sections.find(s=>s.id===sid);if(!s)return;s.headers.push(`Col ${s.headers.length+1}`);s.rows.forEach(r=>r.push(''));renderSL();render();}
+function tAR(sid){const s=S.sections.find(s=>s.id===sid);if(!s)return;s.rows.push(new Array(s.headers.length).fill(''));renderSL();render();}
+function tRC(sid,ci){const s=S.sections.find(s=>s.id===sid);if(!s||s.headers.length<=1)return;s.headers.splice(ci,1);s.rows.forEach(r=>r.splice(ci,1));renderSL();render();}
+function tRR(sid,ri){const s=S.sections.find(s=>s.id===sid);if(!s||s.rows.length<=1)return;s.rows.splice(ri,1);renderSL();render();}
+function ef(cmd,val,sid){const ed=document.getElementById(`ced-${sid}`);if(!ed)return;ed.focus();document.execCommand(cmd,false,val);const s=S.sections.find(s=>s.id===sid);if(s){s.content=ed.innerHTML;render();}}
+
+/* PAGE ORDER */
+function pgUp(idx){if(idx<=1)return;[S.sections[idx-2],S.sections[idx-1]]=[S.sections[idx-1],S.sections[idx-2]];renderSL();render();}
+function pgDown(idx,tot){if(idx===0||idx>=tot-1)return;[S.sections[idx-1],S.sections[idx]]=[S.sections[idx],S.sections[idx-1]];renderSL();render();}
+
+/* RENDER */
+function render(){
+  const P=PAPERS[S.paper]; const z=S.zoom/100; const ac=S.accent; const acD=shade(ac,-28);
+  const fnt=gv('st-font')||"'Barlow',sans-serif";
+  const bfs=+(gv('st-fs')||13); const lh=+(gv('st-lh')||1.8);
+  const hs=+(gv('st-hs')||20); const ta=gv('st-ta')||'justify';
+  const mv=+(gv('st-mv')||48); const mh=+(gv('st-mh')||60);
+  const ih=+(gv('st-ih')||320); const ch=+(gv('st-ch')||110);
+  const co=gv('f-co')||'Amaar Mining'; const title=gv('f-title')||'Exploration Report';
+  const dept=gv('f-dept'); const date=gv('f-date'); const ref=gv('f-ref');
+  const conf=gv('f-conf')||'Confidential'; const ver=gv('f-ver');
+  const prep=gv('f-prep'); const rev=gv('f-rev'); const appr=gv('f-appr');
+  const secs=S.sections.filter(s=>s.title||s.content||s.images.length||(s.type==='table'&&s.rows.some(r=>r.some(c=>c.trim()))));
+  const tot=1+secs.length;
+  const rp=document.getElementById('rp'); rp.innerHTML='';
+  document.getElementById('zpct').textContent=S.zoom+'%';
+
+  function shell(idx){
+    const sh=mk('div','ps');
+    sh.style.cssText=`width:${Math.round(P.w*z)}px;margin-bottom:24px`;
+    const pc=mk('div','pc');
+    const up=mk('button','pcb'); up.innerHTML='↑ Move Up'; up.disabled=(idx<=1); up.onclick=()=>pgUp(idx);
+    const lbl=mk('div','pclbl'); lbl.textContent=`Page ${idx+1} / ${tot}`;
+    const dn=mk('button','pcb'); dn.innerHTML='Move Down ↓'; dn.disabled=(idx===0||idx>=tot-1); dn.onclick=()=>pgDown(idx,tot);
+    pc.append(up,lbl,dn); sh.appendChild(pc);
+    const pg=mk('div','wpg'); pg.style.cssText=`width:${P.w}px;min-height:${P.h}px;transform:scale(${z});transform-origin:top left;display:flex;flex-direction:column`;
+    sh.appendChild(pg);
+    return{sh,pg};
+  }
+
+  function e(tag,css=''){const el=document.createElement(tag);if(css)el.style.cssText=css;return el;}
+
+  /* COVER */
+  {
+    const{sh,pg}=shell(0);
+    // stripe
+    const stripe=e('div',`position:absolute;top:0;left:0;bottom:0;width:5px;background:linear-gradient(180deg,${ac},${acD},${ac})`); pg.style.position='relative'; pg.style.overflow='hidden'; pg.appendChild(stripe);
+    // top row
+    const top=e('div',`display:flex;justify-content:space-between;align-items:flex-start;padding:18px 44px 12px 52px;border-bottom:1px solid #EBEBEB;flex-shrink:0`);
+    const lsm=e('div','');
+    if(S.logo){const img=new Image();img.src=S.logo;img.style.cssText='max-height:36px;max-width:120px;object-fit:contain';lsm.appendChild(img);}
+    else{const t=e('div',`font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;letter-spacing:3px;text-transform:uppercase;color:${ac}`);t.textContent=co;lsm.appendChild(t);}
+    top.appendChild(lsm);
+    const tr=e('div','text-align:right;font-size:9px;color:#AAA;line-height:1.7');
+    if(ref){const d=e('div','font-weight:700;color:#555');d.textContent=`Ref: ${ref}`;tr.appendChild(d);}
+    if(conf){const d=e('div','');d.textContent=conf;tr.appendChild(d);}
+    if(ver){const d=e('div','');d.textContent=`Version: ${ver}`;tr.appendChild(d);}
+    top.appendChild(tr); pg.appendChild(top);
+    // center
+    const ctr=e('div','display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;padding:32px 56px 20px');
+    if(S.logo){const img=new Image();img.src=S.logo;img.style.cssText='max-height:88px;max-width:250px;object-fit:contain;display:block;margin:0 auto 22px';ctr.appendChild(img);}
+    else{const t=e('div',`font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;letter-spacing:5px;text-transform:uppercase;color:${ac};margin-bottom:22px`);t.textContent=co;ctr.appendChild(t);}
+    if(dept){const d=e('div',`font-family:'Cormorant Garamond',serif;font-style:italic;color:#555;font-size:13px;margin-bottom:5px`);d.textContent=dept;ctr.appendChild(d);}
+    const rule=e('div',`width:60px;height:3px;background:linear-gradient(90deg,transparent,${ac},transparent);margin:11px auto`); ctr.appendChild(rule);
+    const tb=e('div',`font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#111;border-top:2px solid ${ac};border-bottom:2px solid ${ac};padding:9px 22px;display:inline-block;margin-bottom:7px`);tb.textContent=title;ctr.appendChild(tb);
+    if(date){const d=e('div',`font-family:'Space Mono',monospace;font-size:9px;color:#999;letter-spacing:2px;text-transform:uppercase;margin-top:7px`);d.textContent=date;ctr.appendChild(d);}
+    if(S.siteImgs.length){
+      const strip=e('div',`display:flex;gap:2px;width:100%;height:${ch}px;margin-top:22px;overflow:hidden`);
+      S.siteImgs.forEach(url=>{const img=new Image();img.src=url;img.style.cssText=`flex:1;height:${ch}px;object-fit:cover;min-width:0;display:block;filter:brightness(.88)`;strip.appendChild(img);});
+      ctr.appendChild(strip);
+    }
+    pg.appendChild(ctr);
+    // footer
+    const ftr=e('div','padding:12px 44px 16px 52px;background:#F8F8F8;border-top:1px solid #EBEBEB;flex-shrink:0');
+    const sigs=[[prep,'Prepared By'],[rev,'Reviewed By'],[appr,'Approved By']].filter(([v])=>v);
+    if(sigs.length){
+      const sr=e('div','display:flex;gap:20px;flex-wrap:wrap;margin-bottom:8px');
+      sigs.forEach(([v,label])=>{const si=e('div','');si.innerHTML=`<div style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#AAA;margin-bottom:1px">${label}</div><div style="font-size:10px;font-weight:500;color:#333">${v}</div>`;sr.appendChild(si);});
+      ftr.appendChild(sr);
+    }
+    const fbar=e('div',`display:flex;justify-content:space-between;align-items:center;border-top:2px solid ${ac};padding-top:6px`);
+    const fl=e('div',`font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:#666;text-transform:uppercase`);fl.textContent=co+(title?` · ${title}`:'');fbar.appendChild(fl);
+    const fr2=e('div',`font-family:'Space Mono',monospace;font-size:8px;color:#AAA`);fr2.textContent=(ref||'')+(date?` · ${date}`:'');fbar.appendChild(fr2);
+    ftr.appendChild(fbar); pg.appendChild(ftr);
+    rp.appendChild(sh);
+  }
+
+  /* SECTION PAGES */
+  secs.forEach((sec,idx)=>{
+    const{sh,pg}=shell(idx+1);
+    const inner=e('div',`padding:${mv}px ${mh}px ${Math.round(mv*.8)}px;display:flex;flex-direction:column;flex:1`);
+    // header bar
+    const pgh=e('div','display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #EBEBEB;padding-bottom:6px;margin-bottom:16px');
+    const phl=e('div',`font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${ac}`);phl.textContent=`${co} – ${title}`;pgh.appendChild(phl);
+    const phr=e('div',`font-family:'Space Mono',monospace;font-size:8px;color:#BBB`);phr.textContent=date;pgh.appendChild(phr);
+    inner.appendChild(pgh);
+    // heading
+    const sh2=e('div',`display:flex;align-items:baseline;gap:8px;border-bottom:2px solid ${ac};padding-bottom:7px;margin-bottom:14px`);
+    const sn=e('span',`font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:${ac}`);sn.textContent=String(idx+1).padStart(2,'0')+'.';sh2.appendChild(sn);
+    const st=e('span',`font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:${hs}px;text-transform:uppercase;color:#111`);st.textContent=sec.title||`Section ${idx+1}`;sh2.appendChild(st);
+    inner.appendChild(sh2);
+    // text
+    if(sec.content&&sec.content.trim()){
+      const bt=e('div',`font-family:${fnt};font-size:${bfs}px;line-height:${lh};text-align:${ta};color:#333;margin-bottom:14px;hyphens:auto`);
+      bt.innerHTML=sec.content; inner.appendChild(bt);
+    }
+    // table
+    if(sec.type==='table'&&sec.headers){
+      const tw=e('div','overflow-x:auto;margin:6px 0 14px');
+      const tbl=e('table','border-collapse:collapse;width:100%');
+      const thead=document.createElement('thead');const tr=document.createElement('tr');
+      sec.headers.forEach(h=>{const th=e('th',`background:${ac};color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:7px 10px;border:1px solid rgba(0,0,0,.15);text-align:left`);th.textContent=h;tr.appendChild(th);});
+      thead.appendChild(tr);tbl.appendChild(thead);
+      const tbody=document.createElement('tbody');
+      sec.rows.forEach((row,ri)=>{const tr=document.createElement('tr');row.forEach(c=>{const td=e('td',`border:1px solid #E0E0E0;padding:5px 10px;font-size:11px;color:#333;${ri%2?'background:#F9F6F2':''}`);td.textContent=c;tr.appendChild(td);});tbody.appendChild(tr);});
+      tbl.appendChild(tbody);tw.appendChild(tbl);inner.appendChild(tw);
+    }
+    // images
+    sec.images.forEach((img)=>{
+      const fig=e('div','text-align:center;margin-bottom:13px');
+      const im=new Image();im.src=img.url;im.style.cssText=`display:block;margin:0 auto;max-width:100%;max-height:${ih}px;border:1px solid #E8E8E8`;
+      fig.appendChild(im); inner.appendChild(fig);
+    });
+    // spacer + footer
+    const sp=e('div','flex:1'); inner.appendChild(sp);
+    const pgf=e('div','display:flex;justify-content:space-between;align-items:center;border-top:1px solid #EBEBEB;padding-top:7px;margin-top:12px');
+    const pfc=e('div',`font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:${ac};opacity:.55`);pfc.textContent=`${conf} · ${co}`;pgf.appendChild(pfc);
+    const pfn=e('div',`font-family:'Space Mono',monospace;font-size:9px;color:#BBB`);pfn.textContent=idx+2;pgf.appendChild(pfn);
+    inner.appendChild(pgf); pg.appendChild(inner);
+    rp.appendChild(sh);
+  });
+}
+
+/* PDF via print dialog — browser saves as PDF */
+function doPDF(){
+  const P=PAPERS[S.paper];
+  let s=document.getElementById('_ps');
+  if(!s){s=document.createElement('style');s.id='_ps';document.head.appendChild(s);}
+  s.textContent=`@page{size:${P.w}px ${P.h}px;margin:0}`;
+  window.print();
+}
+
+/* HELPERS */
+function gv(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function readFile(f,cb){const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(f);}
+function shade(c,p){let r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);r=Math.max(0,Math.min(255,r+p));g=Math.max(0,Math.min(255,g+p));b=Math.max(0,Math.min(255,b+p));return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function mk(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
+</script>
+</body>
+</html>
